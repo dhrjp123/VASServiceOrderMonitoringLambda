@@ -1,0 +1,9 @@
+{
+  "city": "City-3",
+  "sellerID": null,
+  "serviceCategory": null,
+  "groupingCriteria": [
+    "sellerID",
+    "time"
+  ]
+}
