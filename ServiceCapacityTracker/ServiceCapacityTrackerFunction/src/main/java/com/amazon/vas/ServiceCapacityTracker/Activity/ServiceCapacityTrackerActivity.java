@@ -1,6 +1,7 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityTrackerComponent;
+import com.amazon.vas.ServiceCapacityTracker.Exception.InvalidInputException;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerRequestBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerResponseBO;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -10,19 +11,21 @@ import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 import java.util.Map;
 
-public class ServiceCapacityTrackerActivity implements RequestHandler<Map<String,String>, Object>
+public class ServiceCapacityTrackerActivity
 {
-    public Object handleRequest(final Map<String,String> input, final Context context)
+    private ServiceCapacityTrackerComponent serviceCapacityTrackerComponent;
+    public ServiceCapacityTrackerActivity(ServiceCapacityTrackerComponent serviceCapacityTrackerComponent)
     {
-        LambdaLogger logger=context.getLogger();
+        this.serviceCapacityTrackerComponent=serviceCapacityTrackerComponent;
+    }
+    public Object handleRequest(final Map<String,String> input)
+    {
+        validateInput(input);
         ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO =
                 translateInputToServiceCapacityTrackerRequestBO(input);
         ServiceCapacityTrackerResponseBO serviceCapacityTrackerResponseBO =
-                new ServiceCapacityTrackerComponent().trackCapacity(serviceCapacityTrackerRequestBO);
-        String serviceCapacityTrackerResponse =
-                translateServiceCapacityTrackerResponseBOToJson(serviceCapacityTrackerResponseBO);
-        logger.log(serviceCapacityTrackerResponse);
-        return serviceCapacityTrackerResponse;
+                serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerRequestBO);
+        return translateServiceCapacityTrackerResponseBOToJson(serviceCapacityTrackerResponseBO);
     }
     public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(Map<String,String> input)
     {
@@ -32,5 +35,10 @@ public class ServiceCapacityTrackerActivity implements RequestHandler<Map<String
     {
         Gson gson=new Gson();
         return gson.toJson(serviceCapacityTrackerResponseBO,ServiceCapacityTrackerResponseBO.class);
+    }
+    public void validateInput(Map<String,String> input)
+    {
+        if(input.get("serviceType")==null || input.get("serviceType").equals(""))
+            throw new InvalidInputException("serviceType cannot be empty");
     }
 }

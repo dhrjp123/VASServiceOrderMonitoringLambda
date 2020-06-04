@@ -2,7 +2,7 @@ Resources:
   Function:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: com.amazon.vas.ServiceCapacityTracker.Activity.ServiceCapacityTrackerActivity::handleRequest
+      Handler: com.amazon.vas.ServiceCapacityTracker.Activity.RequestRouter::handleRequest
       CodeUri: Function
       Runtime: java8
       Timeout: 300
