@@ -1,9 +1,9 @@
 {
-  "city": "City-3",
-  "sellerID": null,
+  "city": "City-5",
+  "merchantID": "Merchant-10",
   "serviceCategory": null,
   "groupingCriteria": [
-    "sellerID",
+    "city",
     "time"
   ]
 }

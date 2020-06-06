@@ -1,36 +1,24 @@
 package handler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import accessor.ElasticSearchAccessor;
 import activity.GetJobMetricsActivity;
-import model.GetJobDetailsInput;
 import model.GetJobMetricsInput;
 import model.GetJobMetricsOutput;
-import model.JobDetails;
 import org.junit.Test;
 
+import java.beans.IntrospectionException;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppTest {
   @Test
-  public void testActivity() throws IOException {
+  public void testActivity() throws IOException, IntrospectionException {
     List<String> groupingCriteria = new ArrayList<>();
-    groupingCriteria.add("technicianID");
+    groupingCriteria.add("city");
     groupingCriteria.add("time");
-    GetJobMetricsInput input = new GetJobMetricsInput("City-5", "MerchantID-10", null, groupingCriteria);
-    GetJobMetricsOutput output = new GetJobMetricsActivity().enact(input);
-    System.out.println(output.toString());
+    GetJobMetricsInput getJobMetricsInput = new GetJobMetricsInput("City-5", "MerchantID-10", null, groupingCriteria);
+    GetJobMetricsOutput getJobMetricsOutput = new GetJobMetricsActivity().enact(getJobMetricsInput);
+    System.out.println(getJobMetricsOutput.toString());
   }
 
-  @Test
-  public void testAccessor() throws IOException{
-    GetJobDetailsInput rawInput = new GetJobDetailsInput("City-5","MerchantId-4",null);
-    ElasticSearchAccessor elasticSearchAccessor = new ElasticSearchAccessor();
-    List<String> output = elasticSearchAccessor.getJobDetailsAccessor(rawInput);
-    System.out.println(output.toString());
-  }
 }

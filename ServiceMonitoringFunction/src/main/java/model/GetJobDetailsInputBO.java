@@ -1,11 +1,10 @@
 package model;
 
 import lombok.Value;
-import java.util.Date;
 
 @Value
-public class GetJobDetailsInput {
+public class GetJobDetailsInputBO {
     private final String city;
-    private final String sellerID;
+    private final String merchantID;
     private final String serviceCategory;
 }
