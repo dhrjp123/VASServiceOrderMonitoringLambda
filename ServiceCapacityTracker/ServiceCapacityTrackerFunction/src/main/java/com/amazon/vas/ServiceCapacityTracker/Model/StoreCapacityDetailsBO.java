@@ -9,7 +9,10 @@ import java.util.List;
 @Value
 public class StoreCapacityDetailsBO
 {
+    @NonNull
     String storeName;
+    @NonNull
     String storeId;
+    @NonNull
     List<StoreCapacityBO> capacityList;
 }

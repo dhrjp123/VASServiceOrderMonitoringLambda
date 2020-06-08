@@ -9,5 +9,6 @@ import java.util.List;
 @Value
 public class ServiceCapacityTrackerResponseBO
 {
+    @NonNull
     List<StoreCapacityDetailsBO> storeList;
 }

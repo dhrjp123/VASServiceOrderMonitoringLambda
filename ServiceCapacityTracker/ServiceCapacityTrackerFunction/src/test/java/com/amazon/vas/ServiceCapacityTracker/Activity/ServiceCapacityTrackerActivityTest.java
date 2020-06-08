@@ -10,6 +10,7 @@ import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityDetailsBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerRequestBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerResponseBO;
 import com.google.common.collect.ImmutableList;
+import lombok.NonNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.*;
@@ -80,7 +81,7 @@ public class ServiceCapacityTrackerActivityTest
             .storeList(storeList).build();
     return serviceCapacityTrackerResponseBO;
   }
-  public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(Map<String,String> input)
+  public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(@NonNull final Map<String,String> input)
   {
     return ServiceCapacityTrackerRequestBO.builder().skillType(input.get("skillType")).
             marketplaceId(input.get("marketplaceId")).pinCode(input.get("pinCode")).

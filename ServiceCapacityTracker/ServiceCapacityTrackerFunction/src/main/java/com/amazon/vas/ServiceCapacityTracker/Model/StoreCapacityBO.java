@@ -6,6 +6,8 @@ import lombok.*;
 @Value
 public class StoreCapacityBO
 {
+    @NonNull
     int totalCapacity;
+    @NonNull
     int availableCapacity;
 }

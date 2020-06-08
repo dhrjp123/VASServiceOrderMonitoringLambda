@@ -7,12 +7,13 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
+import lombok.NonNull;
 
 import java.util.Map;
 
 public class RequestRouter implements RequestHandler<Map<String,String>, Object>
 {
-    Gson gson=new Gson();
+    private final Gson gson=new Gson();
     public Object handleRequest(final Map<String,String> input, final Context context)
     {
         LambdaLogger logger=context.getLogger();
@@ -27,13 +28,13 @@ public class RequestRouter implements RequestHandler<Map<String,String>, Object>
         logger.log("Response : "+serviceCapacityTrackerResponse);
         return serviceCapacityTrackerResponse;
     }
-    public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(Map<String,String> input)
+    public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(@NonNull final Map<String,String> input)
     {
         return ServiceCapacityTrackerRequestBO.builder().skillType(input.get("skillType")).
                 marketplaceId(input.get("marketplaceId")).pinCode(input.get("pinCode")).
                 storeId(input.get("storeId")).build();
     }
-    public String translateServiceCapacityTrackerResponseBOToJson(ServiceCapacityTrackerResponseBO serviceCapacityTrackerResponseBO)
+    public String translateServiceCapacityTrackerResponseBOToJson(@NonNull final ServiceCapacityTrackerResponseBO serviceCapacityTrackerResponseBO)
     {
         return gson.toJson(serviceCapacityTrackerResponseBO,ServiceCapacityTrackerResponseBO.class);
     }

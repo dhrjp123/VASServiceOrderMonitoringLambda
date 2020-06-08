@@ -8,17 +8,18 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
+import lombok.NonNull;
 import org.json.simple.JSONObject;
 import java.util.Map;
 
 public class ServiceCapacityTrackerActivity
 {
-    private ServiceCapacityTrackerComponent serviceCapacityTrackerComponent;
-    public ServiceCapacityTrackerActivity(ServiceCapacityTrackerComponent serviceCapacityTrackerComponent)
+    private final ServiceCapacityTrackerComponent serviceCapacityTrackerComponent;
+    public ServiceCapacityTrackerActivity(@NonNull final ServiceCapacityTrackerComponent serviceCapacityTrackerComponent)
     {
         this.serviceCapacityTrackerComponent=serviceCapacityTrackerComponent;
     }
-    public ServiceCapacityTrackerResponseBO handleRequest(ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO)
+    public ServiceCapacityTrackerResponseBO handleRequest(@NonNull final ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO)
     {
         return serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerRequestBO);
     }
