@@ -8,7 +8,9 @@ import java.util.List;
 @Data
 @Builder
 @Value
-public class ServiceCapacityTrackerResponseBO
+public class StoreCapacityDetailsBO
 {
-    private List<StoreCapacityDetailsBO> storeList;
+    private String storeName;
+    private String storeId;
+    private List<StoreCapacityBO> capacityList;
 }

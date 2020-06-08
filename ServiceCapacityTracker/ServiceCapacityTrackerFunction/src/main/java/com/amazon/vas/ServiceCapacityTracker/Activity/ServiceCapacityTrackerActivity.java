@@ -18,27 +18,8 @@ public class ServiceCapacityTrackerActivity
     {
         this.serviceCapacityTrackerComponent=serviceCapacityTrackerComponent;
     }
-    public Object handleRequest(final Map<String,String> input)
+    public ServiceCapacityTrackerResponseBO handleRequest(ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO)
     {
-        validateInput(input);
-        ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO =
-                translateInputToServiceCapacityTrackerRequestBO(input);
-        ServiceCapacityTrackerResponseBO serviceCapacityTrackerResponseBO =
-                serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerRequestBO);
-        return translateServiceCapacityTrackerResponseBOToJson(serviceCapacityTrackerResponseBO);
-    }
-    public ServiceCapacityTrackerRequestBO translateInputToServiceCapacityTrackerRequestBO(Map<String,String> input)
-    {
-        return new ServiceCapacityTrackerRequestBO(input.get("serviceType"),input.get("cityName"));
-    }
-    public String translateServiceCapacityTrackerResponseBOToJson(ServiceCapacityTrackerResponseBO serviceCapacityTrackerResponseBO)
-    {
-        Gson gson=new Gson();
-        return gson.toJson(serviceCapacityTrackerResponseBO,ServiceCapacityTrackerResponseBO.class);
-    }
-    public void validateInput(Map<String,String> input)
-    {
-        if(input.get("serviceType")==null || input.get("serviceType").equals(""))
-            throw new InvalidInputException("serviceType cannot be empty");
+        return serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerRequestBO);
     }
 }

@@ -1,15 +1,14 @@
 package com.amazon.vas.ServiceCapacityTracker.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@Builder
+@Value
 public class ServiceCapacityTrackerRequestBO
 {
-    private String serviceType;
-    private String cityName;
+    private String skillType;
+    private String storeId;
+    private String marketplaceId;
+    private String pinCode;
 }
