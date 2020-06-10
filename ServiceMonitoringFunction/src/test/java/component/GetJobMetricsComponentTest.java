@@ -107,7 +107,7 @@ public class GetJobMetricsComponentTest {
         return expectedJobDetailsList;
     }
     private List<String> buildJobDetailsJson(){
-        JSONObject json = new JSONObject();
+        final JSONObject json = new JSONObject();
         json.put("jdes", NOT_SERVICED);
         json.put("jbd",EPOCH_TIME);
         json.put("cty",CITY_NAME);
