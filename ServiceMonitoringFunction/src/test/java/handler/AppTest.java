@@ -73,20 +73,18 @@ public class AppTest {
 
   private String buildExpectedGetJobMetricsOutputJson(){
     JobAggregatedMetricsBO jobAggregatedMetricsBO = JobAggregatedMetricsBO.builder().totalJobsCount(1).statusNotUpdatedCount(1).otaFailureCount(1).etaDelayCount(1).build();
-    List<String> groupingCriteriaValues = new ArrayList<>();
-    groupingCriteriaValues.add(CITY_NAME);
-    groupingCriteriaValues.add(EPOCH_TIME);
-    Map<String, Map<String,String>> metaData = new HashMap<String,Map<String,String>>(){{
+    final List<String> groupingCriteriaValues = new ArrayList<String>(Arrays.asList(CITY_NAME,EPOCH_TIME));
+    final Map<String, Map<String,String>> metaData = new HashMap<String,Map<String,String>>(){{
       put(CITY_NAME,new HashMap<String, String>(){{
         put("name",CITY_NAME);
         put("ID",CITY_NAME);
       }});
     }};
 
-    Map<List<String>, JobAggregatedMetricsBO> jobMetricsMap = new HashMap<>();
+    final Map<List<String>, JobAggregatedMetricsBO> jobMetricsMap = new HashMap<>();
     jobMetricsMap.put(groupingCriteriaValues,jobAggregatedMetricsBO);
 
-    GetJobMetricsOutput getJobMetricsOutput = GetJobMetricsOutput.builder().metaData(metaData).jobMetricsMap(jobMetricsMap).build();
+    final GetJobMetricsOutput getJobMetricsOutput = GetJobMetricsOutput.builder().metaData(metaData).jobMetricsMap(jobMetricsMap).build();
     final Gson gson = new Gson();
     return gson.toJson(getJobMetricsOutput);
   }
