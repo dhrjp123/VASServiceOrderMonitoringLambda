@@ -1,6 +1,5 @@
 package handler;
 
-<<<<<<< HEAD
 import com.amazon.vas.serviceordermonitoringlambda.activity.GetJobMetricsActivity;
 import com.amazon.vas.serviceordermonitoringlambda.handler.App;
 import com.amazon.vas.serviceordermonitoringlambda.model.GetJobMetricsInput;
@@ -8,11 +7,6 @@ import com.amazon.vas.serviceordermonitoringlambda.model.GetJobMetricsOutput;
 import com.amazon.vas.serviceordermonitoringlambda.model.JobAggregatedMetricsBO;
 import com.google.gson.Gson;
 import org.junit.Before;
-=======
-import activity.GetJobMetricsActivity;
-import model.GetJobMetricsInput;
-import model.GetJobMetricsOutput;
->>>>>>> 5699f3300f58f59a95fc959213e122aee91b541b
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,8 +14,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.beans.IntrospectionException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +36,6 @@ public class AppTest {
 
   @Test
   public void testActivity() throws IOException, IntrospectionException {
-<<<<<<< HEAD
     when(getJobMetricsActivity.enact(any(GetJobMetricsInput.class))).thenReturn(buildGetJobMetricsOutput());
     String actualJobMetricsOutputJson = app.handleRequest(buildLambdaInput(),new util.TestContext());
     String expectedJobMetricsOutputJson = buildExpectedGetJobMetricsOutputJson();
@@ -95,19 +87,8 @@ public class AppTest {
     jobMetricsMap.put(groupingCriteriaValues,jobAggregatedMetricsBO);
 
     GetJobMetricsOutput getJobMetricsOutput = GetJobMetricsOutput.builder().metaData(metaData).jobMetricsMap(jobMetricsMap).build();
-    Gson gson = new Gson();
+    final Gson gson = new Gson();
     return gson.toJson(getJobMetricsOutput);
   }
 
 }
-=======
-    List<String> groupingCriteria = new ArrayList<>();
-    groupingCriteria.add("city");
-    groupingCriteria.add("time");
-    GetJobMetricsInput getJobMetricsInput = new GetJobMetricsInput("City-5", "MerchantID-10", null, groupingCriteria);
-    GetJobMetricsOutput getJobMetricsOutput = new GetJobMetricsActivity().enact(getJobMetricsInput);
-    System.out.println(getJobMetricsOutput.toString());
-  }
-
-}
->>>>>>> 5699f3300f58f59a95fc959213e122aee91b541b
