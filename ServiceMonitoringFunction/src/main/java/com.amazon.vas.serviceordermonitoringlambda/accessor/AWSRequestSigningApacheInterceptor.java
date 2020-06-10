@@ -1,4 +1,4 @@
-package accessor;
+package com.amazon.vas.serviceordermonitoringlambda.accessor;
 
 import com.amazonaws.DefaultRequest;
 import com.amazonaws.auth.AWSCredentialsProvider;
