@@ -73,21 +73,18 @@ public class GetJobMetricsComponent {
     private String getGroupingCriteriaValue(String criterion, JobDetailsBO jobDetailsBO) throws RuntimeException{
         String groupingCriteriaValue;
         GroupingCriteria CRITERION = GroupingCriteria.valueOf(criterion);
+
         switch (CRITERION){
-            case CITY: groupingCriteriaValue = jobDetailsBO.getCity();break;
-            case MERCHANT_ID: groupingCriteriaValue = jobDetailsBO.getMerchantId();break;
-            case TECHNICIAN_ID: groupingCriteriaValue = jobDetailsBO.getTechnicianID();break;
-            case SLOT_START_TIME: groupingCriteriaValue = jobDetailsBO.getSlotStartTime();break;
+            case city: groupingCriteriaValue = jobDetailsBO.getCity();break;
+            case merchantId: groupingCriteriaValue = jobDetailsBO.getMerchantId();break;
+            case technicianId: groupingCriteriaValue = jobDetailsBO.getTechnicianID();break;
+            case slotStartTime: groupingCriteriaValue = jobDetailsBO.getSlotStartTime();break;
             default :throw new RuntimeException();
         }
         return groupingCriteriaValue;
     }
     private enum GroupingCriteria{
-        CITY("city"),MERCHANT_ID("merchantId"),TECHNICIAN_ID("technicianID"), SLOT_START_TIME("slotStartTime");
-        public final String criterion;
-        private GroupingCriteria(String criterion){
-            this.criterion = criterion;
-        }
+        city,merchantId,technicianId, slotStartTime;
     }
 
 }
