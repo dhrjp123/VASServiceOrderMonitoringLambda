@@ -21,7 +21,7 @@ public class JobDetailsBO {
     private final String merchantId;
 
     @SerializedName("tid")
-    private final String technicianID;
+    private final String technicianId;
 
     @SerializedName("jbd")
     private final String slotStartTime;
