@@ -19,18 +19,18 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.amazon.vas.serviceordermonitoringlambda.util.ApplicationConstants.searchResultSize;
-import static com.amazon.vas.serviceordermonitoringlambda.util.ApplicationConstants.searchScrollTimeout;
 
-
-@RequiredArgsConstructor(onConstructor = @__({ @Inject}))
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class JobDetailsBuilder {
 
     @NonNull
     private final ElasticSearchAccessor elasticSearchAccessor;
 
     private static final Gson gson = new Gson();
-    static final String JOB_ES_INDEX = "jobs";
+    private static final String JOB_ES_INDEX = "jobs";
+    private static final long SEARCH_SCROLL_TIMEOUT = 1L;
+    private static final int SEARCH_RESULT_SIZE = 5000;
+
     public ArrayList<JobDetailsBO> getJobDetailsBuilder(@NonNull final GetJobMetricsInputBO getJobMetricsInputBO) {
 
         final QueryBuilder queryBuilder = buildJobDetailsESQuery(getJobMetricsInputBO);
@@ -38,39 +38,41 @@ public class JobDetailsBuilder {
         final List<String> jobDetailsJson = elasticSearchAccessor.getRecords(searchRequest);
 
         final ArrayList<JobDetailsBO> jobDetailsList = new ArrayList<>();
-        for(String job:jobDetailsJson){
+        for (String job : jobDetailsJson) {
             jobDetailsList.add(buildJobDetailsBO(job));
         }
         return jobDetailsList;
     }
 
-    private QueryBuilder buildJobDetailsESQuery(final GetJobMetricsInputBO getJobMetricsInputBO){
+    private QueryBuilder buildJobDetailsESQuery(final GetJobMetricsInputBO getJobMetricsInputBO) {
 
         QueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        if(StringUtils.isNotEmpty(getJobMetricsInputBO.getCity()) ) {
-            queryBuilder = ((BoolQueryBuilder) queryBuilder).must(new MatchQueryBuilder("cty", getJobMetricsInputBO.getCity()));
+        if (StringUtils.isNotEmpty(getJobMetricsInputBO.getCity())) {
+            queryBuilder = ((BoolQueryBuilder) queryBuilder)
+                    .must(new MatchQueryBuilder("cty", getJobMetricsInputBO.getCity()));
         }
-        if(StringUtils.isNotEmpty(getJobMetricsInputBO.getMerchantId()))  {
-            queryBuilder = ((BoolQueryBuilder) queryBuilder).must(new MatchQueryBuilder("mid", getJobMetricsInputBO.getMerchantId()));
+        if (StringUtils.isNotEmpty(getJobMetricsInputBO.getMerchantId())) {
+            queryBuilder = ((BoolQueryBuilder) queryBuilder)
+                    .must(new MatchQueryBuilder("mid", getJobMetricsInputBO.getMerchantId()));
         }
 
         return queryBuilder;
     }
 
-    private SearchRequest buildJobDetailsESSearchRequest(final QueryBuilder queryBuilder){
+    private SearchRequest buildJobDetailsESSearchRequest(final QueryBuilder queryBuilder) {
 
         final SearchRequest searchRequest = new SearchRequest(JOB_ES_INDEX);
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.query(queryBuilder);
-        searchSourceBuilder.size(searchResultSize);
-        searchSourceBuilder.fetchSource(new String[]{"jid", "mid", "jbd", "lse", "isj", "cty", "jdes"},null);
+        searchSourceBuilder.size(SEARCH_RESULT_SIZE);
+        searchSourceBuilder.fetchSource(new String[]{"jid", "mid", "jbd", "lse", "isj", "cty", "jdes"}, null);
         searchRequest.source(searchSourceBuilder);
-        searchRequest.scroll(TimeValue.timeValueMinutes(searchScrollTimeout));
+        searchRequest.scroll(TimeValue.timeValueMinutes(SEARCH_SCROLL_TIMEOUT));
 
         return searchRequest;
     }
 
-    private JobDetailsBO buildJobDetailsBO(final String jobDetailsJson){
+    private JobDetailsBO buildJobDetailsBO(final String jobDetailsJson) {
         final JobDetailsBO jobDetailsBO = gson.fromJson(jobDetailsJson, JobDetailsBO.class);
         return jobDetailsBO;
     }
