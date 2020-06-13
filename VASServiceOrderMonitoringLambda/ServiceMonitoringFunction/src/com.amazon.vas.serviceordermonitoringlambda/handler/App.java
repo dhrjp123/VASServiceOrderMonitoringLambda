@@ -24,7 +24,8 @@ public class App {
 
     private final static Gson gson = new Gson();
 
-    public String handleRequest(@NonNull final Map<Object, Object> lambdaInput, @NonNull final Context context) throws IOException, IntrospectionException {
+    public String handleRequest(@NonNull final Map<Object, Object> lambdaInput, @NonNull final Context context)
+            throws IOException, IntrospectionException {
         final LambdaLogger logger = context.getLogger();
         final String city = (String) lambdaInput.get("city");
         final String merchantID = (String) lambdaInput.get("merchantID");
@@ -32,7 +33,8 @@ public class App {
         final List<String> groupingCriteria = (List<String>) lambdaInput.get("groupingCriteria");
 
         final GetJobMetricsActivity getJobMetricsActivity = injector.getInstance(GetJobMetricsActivity.class);
-        final GetJobMetricsInput getJobMetricsInput = GetJobMetricsInput.builder().city(city).merchantId(merchantID).serviceCategory(serviceCategory).groupingCriteria(groupingCriteria).build();
+        final GetJobMetricsInput getJobMetricsInput = GetJobMetricsInput.builder().city(city).merchantId(merchantID)
+                .serviceCategory(serviceCategory).groupingCriteria(groupingCriteria).build();
         final GetJobMetricsOutput getJobMetricsOutput = getJobMetricsActivity.enact(getJobMetricsInput);
 
 
