@@ -6,9 +6,9 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class GetMerchantAggregatedDetailsInput {
     @NonNull
-    int totalCapacity;
+    String encryptedMarketplaceId;
     @NonNull
-    int availableCapacity;
+    String encryptedMerchantId;
 }

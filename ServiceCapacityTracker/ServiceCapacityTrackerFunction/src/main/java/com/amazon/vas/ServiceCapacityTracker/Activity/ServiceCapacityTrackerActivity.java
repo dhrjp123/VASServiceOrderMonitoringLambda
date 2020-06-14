@@ -1,26 +1,42 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityTrackerComponent;
-import com.amazon.vas.ServiceCapacityTracker.Exception.InvalidInputException;
-import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerRequestBO;
-import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerResponseBO;
-import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.gson.Gson;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerActivityInput;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerActivityOutput;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerComponentRequestBO;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityTrackerComponentResponseBO;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import org.json.simple.JSONObject;
-import java.util.Map;
 
-public class ServiceCapacityTrackerActivity
-{
+import javax.inject.Inject;
+
+@AllArgsConstructor
+public class ServiceCapacityTrackerActivity {
+    @Inject
     private final ServiceCapacityTrackerComponent serviceCapacityTrackerComponent;
-    public ServiceCapacityTrackerActivity(@NonNull final ServiceCapacityTrackerComponent serviceCapacityTrackerComponent)
-    {
-        this.serviceCapacityTrackerComponent=serviceCapacityTrackerComponent;
+
+    public ServiceCapacityTrackerActivityOutput handleRequest(
+            @NonNull final ServiceCapacityTrackerActivityInput serviceCapacityTrackerActivityInput) {
+        ServiceCapacityTrackerComponentRequestBO serviceCapacityTrackerComponentRequestBO =
+                translateServiceCapacityTrackerActivityInputToServiceCapacityTrackerComponentRequestBO(
+                        serviceCapacityTrackerActivityInput);
+        ServiceCapacityTrackerComponentResponseBO serviceCapacityTrackerComponentResponseBO =
+                serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerComponentRequestBO);
+        return translateServiceCapacityTrackerComponentResponseBOToServiceCapacityTrackerActivityOutput(
+                serviceCapacityTrackerComponentResponseBO);
     }
-    public ServiceCapacityTrackerResponseBO handleRequest(@NonNull final ServiceCapacityTrackerRequestBO serviceCapacityTrackerRequestBO)
-    {
-        return serviceCapacityTrackerComponent.trackCapacity(serviceCapacityTrackerRequestBO);
+
+    public ServiceCapacityTrackerActivityOutput translateServiceCapacityTrackerComponentResponseBOToServiceCapacityTrackerActivityOutput
+            (@NonNull final ServiceCapacityTrackerComponentResponseBO serviceCapacityTrackerComponentResponseBO) {
+        return ServiceCapacityTrackerActivityOutput.builder()
+                .storeList(serviceCapacityTrackerComponentResponseBO.getStoreList()).build();
+    }
+
+    public ServiceCapacityTrackerComponentRequestBO translateServiceCapacityTrackerActivityInputToServiceCapacityTrackerComponentRequestBO
+            (@NonNull final ServiceCapacityTrackerActivityInput serviceCapacityTrackerActivityInput) {
+        return ServiceCapacityTrackerComponentRequestBO.builder()
+                .skillType(serviceCapacityTrackerActivityInput.getSkillType())
+                .storeName(serviceCapacityTrackerActivityInput.getStoreName())
+                .marketplaceId(serviceCapacityTrackerActivityInput.getMarketplaceId()).build();
     }
 }

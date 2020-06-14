@@ -1,18 +1,18 @@
 package com.amazon.vas.ServiceCapacityTracker.Model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
 @Value
-public class StoreCapacityDetailsBO
-{
+public class StoreCapacityDetailsBO {
     @NonNull
     String storeName;
     @NonNull
-    String storeId;
+    String merchantId;
     @NonNull
     List<StoreCapacityBO> capacityList;
 }

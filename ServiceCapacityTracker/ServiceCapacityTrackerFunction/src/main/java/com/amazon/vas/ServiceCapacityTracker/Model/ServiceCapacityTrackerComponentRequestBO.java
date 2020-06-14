@@ -6,9 +6,11 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class ServiceCapacityTrackerComponentRequestBO {
     @NonNull
-    int totalCapacity;
+    String skillType;
     @NonNull
-    int availableCapacity;
+    String storeName;
+    @NonNull
+    String marketplaceId;
 }

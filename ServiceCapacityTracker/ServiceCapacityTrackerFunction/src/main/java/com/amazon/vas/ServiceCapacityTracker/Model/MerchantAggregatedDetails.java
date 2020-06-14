@@ -6,9 +6,7 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class MerchantAggregatedDetails {
     @NonNull
-    int totalCapacity;
-    @NonNull
-    int availableCapacity;
+    String merchantName;
 }

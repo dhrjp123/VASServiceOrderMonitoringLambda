@@ -6,9 +6,9 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class VasOffer {
     @NonNull
-    int totalCapacity;
+    String merchantId;
     @NonNull
-    int availableCapacity;
+    boolean aggregated;
 }

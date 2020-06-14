@@ -6,9 +6,11 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class GetBuyableOffersInput {
     @NonNull
-    int totalCapacity;
+    String asin;
     @NonNull
-    int availableCapacity;
+    String marketplaceId;
+    @NonNull
+    OfferSelector offerSelector;
 }

@@ -1,14 +1,14 @@
 package com.amazon.vas.ServiceCapacityTracker.Model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Builder
 @Value
-public class ServiceCapacityTrackerResponseBO
-{
+@Builder
+public class ServiceCapacityTrackerActivityOutput {
     @NonNull
     List<StoreCapacityDetailsBO> storeList;
 }

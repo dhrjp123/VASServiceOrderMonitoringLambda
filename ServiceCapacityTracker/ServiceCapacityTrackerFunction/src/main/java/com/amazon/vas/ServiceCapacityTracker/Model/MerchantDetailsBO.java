@@ -6,9 +6,13 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class MerchantDetailsBO {
     @NonNull
-    int totalCapacity;
+    String merchantName;
     @NonNull
-    int availableCapacity;
+    String merchantId;
+    @NonNull
+    String pinCode;
+    @NonNull
+    String asin;
 }

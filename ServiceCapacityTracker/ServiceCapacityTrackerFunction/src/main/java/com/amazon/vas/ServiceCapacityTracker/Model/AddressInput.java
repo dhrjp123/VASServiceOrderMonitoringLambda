@@ -6,9 +6,8 @@ import lombok.Value;
 
 @Builder
 @Value
-public class StoreCapacityBO {
+public class AddressInput {
     @NonNull
-    int totalCapacity;
-    @NonNull
-    int availableCapacity;
+    String postalCode;
+    String countryCode;
 }

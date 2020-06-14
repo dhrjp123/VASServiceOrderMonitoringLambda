@@ -4,11 +4,11 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.List;
+
 @Builder
 @Value
-public class StoreCapacityBO {
+public class ServiceCapacityTrackerComponentResponseBO {
     @NonNull
-    int totalCapacity;
-    @NonNull
-    int availableCapacity;
+    List<StoreCapacityDetailsBO> storeList;
 }

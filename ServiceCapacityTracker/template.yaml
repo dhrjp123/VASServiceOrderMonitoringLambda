@@ -13,6 +13,7 @@ Resources:
     Properties:
       CodeUri: ServiceCapacityTrackerFunction
       Handler: com.amazon.vas.ServiceCapacityTracker.Activity.RequestRouter::handleRequest
+      Policies: arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess
       Runtime: java8
       MemorySize: 512
       Environment:

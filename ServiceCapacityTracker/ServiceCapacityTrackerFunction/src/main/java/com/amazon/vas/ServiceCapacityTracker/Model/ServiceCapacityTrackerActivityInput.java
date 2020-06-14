@@ -1,17 +1,16 @@
 package com.amazon.vas.ServiceCapacityTracker.Model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-@Builder
 @Value
-public class ServiceCapacityTrackerRequestBO
-{
+@Builder
+public class ServiceCapacityTrackerActivityInput {
     @NonNull
     String skillType;
     @NonNull
-    String storeId;
+    String storeName;
     @NonNull
     String marketplaceId;
-    @NonNull
-    String pinCode;
 }
