@@ -1,6 +1,6 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
-import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityTrackerComponent;
+import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
 import com.amazon.vas.ServiceCapacityTracker.Model.*;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -17,7 +17,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ServiceCapacityTrackerActivityTest {
+public class GetServiceCapacityDetailsActivityTest {
     private static final String STORE1_STORE_NAME = "Delhi";
     private static final String STORE1_MERCHANT_ID = "CMID1";
     private static final String STORE2_STORE_NAME = "Jaipur";
@@ -30,9 +30,9 @@ public class ServiceCapacityTrackerActivityTest {
     final private static String STORE_NAME = "";
     final private static String MARKETPLACE_ID = "India";
     @Mock
-    private ServiceCapacityTrackerComponent serviceCapacityTrackerComponent;
+    private ServiceCapacityDetailsComponent serviceCapacityDetailsComponent;
     @InjectMocks
-    private ServiceCapacityTrackerActivity serviceCapacityTrackerActivity;
+    private GetServiceCapacityDetailsActivity getServiceCapacityDetailsActivity;
 
     @Before
     public void setup() {
@@ -41,30 +41,30 @@ public class ServiceCapacityTrackerActivityTest {
 
     @Test
     public void testHandleRequest_withValidInput_thenSuccessfulResponse() {
-        ServiceCapacityTrackerActivityInput serviceCapacityTrackerActivityInput =
+        GetServiceCapacityDetailsInput getServiceCapacityDetailsInput =
                 getDefaultServiceCapacityTrackerActivityInput();
-        ServiceCapacityTrackerActivityOutput expectedServiceCapacityTrackerActivityOutput =
+        GetServiceCapacityDetailsOutput expectedGetServiceCapacityDetailsOutput =
                 getDefaultServiceCapacityTrackerActivityOutput();
-        when(serviceCapacityTrackerComponent.trackCapacity(any(ServiceCapacityTrackerComponentRequestBO.class)))
+        when(serviceCapacityDetailsComponent.trackCapacity(any(ServiceCapacityDetailsInputBO.class)))
                 .thenReturn(translateServiceCapacityTrackerActivityOutputToServiceCapacityTrackerComponentResponseBO
-                        (expectedServiceCapacityTrackerActivityOutput));
-        ServiceCapacityTrackerActivityOutput serviceCapacityTrackerActivityOutput = serviceCapacityTrackerActivity.
-                handleRequest(serviceCapacityTrackerActivityInput);
-        assertEquals(expectedServiceCapacityTrackerActivityOutput, serviceCapacityTrackerActivityOutput);
-        verify(serviceCapacityTrackerComponent).trackCapacity(any(ServiceCapacityTrackerComponentRequestBO.class));
+                        (expectedGetServiceCapacityDetailsOutput));
+        GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput = getServiceCapacityDetailsActivity.
+                handleRequest(getServiceCapacityDetailsInput);
+        assertEquals(expectedGetServiceCapacityDetailsOutput, getServiceCapacityDetailsOutput);
+        verify(serviceCapacityDetailsComponent).trackCapacity(any(ServiceCapacityDetailsInputBO.class));
     }
 
     @Test(expected = NullPointerException.class)
     public void testHandleRequest_withNullInput() {
-        serviceCapacityTrackerActivity.handleRequest(null);
+        getServiceCapacityDetailsActivity.handleRequest(null);
     }
 
-    public ServiceCapacityTrackerActivityInput getDefaultServiceCapacityTrackerActivityInput() {
-        return ServiceCapacityTrackerActivityInput.builder().skillType(SKILL_TYPE).storeName(STORE_NAME)
+    public GetServiceCapacityDetailsInput getDefaultServiceCapacityTrackerActivityInput() {
+        return GetServiceCapacityDetailsInput.builder().skillType(SKILL_TYPE).storeName(STORE_NAME)
                 .marketplaceId(MARKETPLACE_ID).build();
     }
 
-    public ServiceCapacityTrackerActivityOutput getDefaultServiceCapacityTrackerActivityOutput() {
+    public GetServiceCapacityDetailsOutput getDefaultServiceCapacityTrackerActivityOutput() {
         ImmutableList<StoreCapacityBO> capacityList = ImmutableList.of(StoreCapacityBO.builder()
                         .totalCapacity(DAY1_TOTAL_CAPACITY).availableCapacity(DAY1_AVAILABLE_CAPACITY).build(),
                 StoreCapacityBO.builder().totalCapacity(DAY2_TOTAL_CAPACITY)
@@ -76,12 +76,12 @@ public class ServiceCapacityTrackerActivityTest {
         List<StoreCapacityDetailsBO> storeList = new ArrayList<>();
         storeList.add(storeCapacityDetailsBO1);
         storeList.add(storeCapacityDetailsBO2);
-        return ServiceCapacityTrackerActivityOutput.builder().storeList(storeList).build();
+        return GetServiceCapacityDetailsOutput.builder().storeList(storeList).build();
     }
 
-    public ServiceCapacityTrackerComponentResponseBO translateServiceCapacityTrackerActivityOutputToServiceCapacityTrackerComponentResponseBO
-            (ServiceCapacityTrackerActivityOutput serviceCapacityTrackerActivityOutput) {
-        return ServiceCapacityTrackerComponentResponseBO.builder()
-                .storeList(serviceCapacityTrackerActivityOutput.getStoreList()).build();
+    public ServiceCapacityDetailsBO translateServiceCapacityTrackerActivityOutputToServiceCapacityTrackerComponentResponseBO
+            (GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
+        return ServiceCapacityDetailsBO.builder()
+                .storeList(getServiceCapacityDetailsOutput.getStoreList()).build();
     }
 }
