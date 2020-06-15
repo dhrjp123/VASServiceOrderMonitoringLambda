@@ -6,11 +6,11 @@ import lombok.Value;
 
 @Builder
 @Value
-public class DynamoDbAccessorInput {
+public class ServiceCapacityDetailsInputBO {
     @NonNull
-    String asin;
+    String skillType;
     @NonNull
-    String merchantId;
+    String storeName;
     @NonNull
-    String pinCode;
+    String marketplaceId;
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Value
 @Builder
-public class ServiceCapacityTrackerActivityOutput {
+public class GetServiceCapacityDetailsOutput {
     @NonNull
     List<StoreCapacityDetailsBO> storeList;
 }

@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class ServiceCapacityTrackerActivityInput {
+public class GetServiceCapacityDetailsInput {
     @NonNull
     String skillType;
     @NonNull

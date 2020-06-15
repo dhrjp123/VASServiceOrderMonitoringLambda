@@ -3,9 +3,11 @@ package com.amazon.vas.ServiceCapacityTracker.Modules;
 import com.amazon.vas.ServiceCapacityTracker.Accessor.DynamoDbAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Accessor.SPINServiceAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Accessor.VOSServiceAccessor;
-import com.amazon.vas.ServiceCapacityTracker.Activity.ServiceCapacityTrackerActivity;
-import com.amazon.vas.ServiceCapacityTracker.Builder.ViewDataBuilder;
-import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityTrackerComponent;
+import com.amazon.vas.ServiceCapacityTracker.Activity.GetServiceCapacityDetailsActivity;
+import com.amazon.vas.ServiceCapacityTracker.Builder.CapacityDataBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Builder.MerchantDetailsBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Builder.OfferDetailsBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
 import com.amazon.vas.ServiceCapacityTracker.Config.AppConfig;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Regions;
@@ -24,25 +26,38 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
 
     @Singleton
     @Provides
-    public ServiceCapacityTrackerActivity buildServiceCapacityTrackerActivity(
-            @NonNull ServiceCapacityTrackerComponent serviceCapacityTrackerComponent) {
-        return new ServiceCapacityTrackerActivity(serviceCapacityTrackerComponent);
+    public GetServiceCapacityDetailsActivity buildServiceCapacityTrackerActivity(
+            @NonNull ServiceCapacityDetailsComponent serviceCapacityDetailsComponent) {
+        return new GetServiceCapacityDetailsActivity(serviceCapacityDetailsComponent);
     }
 
     @Singleton
     @Provides
-    public ServiceCapacityTrackerComponent buildServiceCapacityTrackerComponent(
-            @NonNull ViewDataBuilder viewDataBuilder) {
-        return new ServiceCapacityTrackerComponent(viewDataBuilder);
+    public ServiceCapacityDetailsComponent buildServiceCapacityTrackerComponent(
+            @NonNull MerchantDetailsBuilder merchantDetailsBuilder, @NonNull OfferDetailsBuilder offerDetailsBuilder,
+            @NonNull CapacityDataBuilder capacityDataBuilder, @NonNull AppConfig appConfig) {
+        return new ServiceCapacityDetailsComponent(merchantDetailsBuilder, offerDetailsBuilder, capacityDataBuilder,
+                appConfig);
     }
 
     @Singleton
     @Provides
-    public ViewDataBuilder buildViewDataBuilder(@NonNull SPINServiceAccessor spinServiceAccessor,
-                                                @NonNull VOSServiceAccessor vosServiceAccessor,
-                                                @NonNull DynamoDbAccessor dynamoDbAccessor,
-                                                @NonNull AppConfig appConfig) {
-        return new ViewDataBuilder(spinServiceAccessor, vosServiceAccessor, dynamoDbAccessor, appConfig);
+    public OfferDetailsBuilder buildOfferDetailsBuilder(@NonNull VOSServiceAccessor vosServiceAccessor) {
+        return new OfferDetailsBuilder(vosServiceAccessor);
+    }
+
+    @Singleton
+    @Provides
+    public MerchantDetailsBuilder buildMerchantDetailsBuilder(@NonNull SPINServiceAccessor spinServiceAccessor)
+    {
+        return new MerchantDetailsBuilder(spinServiceAccessor);
+    }
+
+    @Singleton
+    @Provides
+    public CapacityDataBuilder buildCapacityDataBuilder(@NonNull DynamoDbAccessor dynamoDbAccessor)
+    {
+        return new CapacityDataBuilder(dynamoDbAccessor);
     }
 
     @Singleton

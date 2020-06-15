@@ -4,13 +4,15 @@ import com.amazon.vas.ServiceCapacityTracker.Model.GetMerchantAggregatedDetailsI
 import com.amazon.vas.ServiceCapacityTracker.Model.GetMerchantAggregatedDetailsOutput;
 import com.amazon.vas.ServiceCapacityTracker.Model.MerchantAggregatedDetails;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class SPINServiceAccessor {
     //Dummy Function to return some Dummy data
-    public List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutputList
+    private List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutputList
     (@NonNull final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
         List<GetMerchantAggregatedDetailsOutput> list = new ArrayList<>();
         for (GetMerchantAggregatedDetailsInput getMerchantAggregatedDetailsInput :

@@ -4,11 +4,14 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
-import java.util.List;
-
-@Builder
 @Value
-public class ServiceCapacityTrackerComponentResponseBO {
+@Builder
+public class OfferDetailsBuilderInput
+{
     @NonNull
-    List<StoreCapacityDetailsBO> storeList;
+    String asin;
+    @NonNull
+    String pinCode;
+    @NonNull
+    String marketplaceId;
 }

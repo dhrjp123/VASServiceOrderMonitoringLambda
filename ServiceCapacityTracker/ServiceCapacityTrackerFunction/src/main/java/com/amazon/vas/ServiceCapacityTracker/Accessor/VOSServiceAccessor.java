@@ -3,13 +3,15 @@ package com.amazon.vas.ServiceCapacityTracker.Accessor;
 import com.amazon.vas.ServiceCapacityTracker.Model.GetBuyableOffersInput;
 import com.amazon.vas.ServiceCapacityTracker.Model.VasOffer;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
-
+@RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class VOSServiceAccessor {
     //Dummy Function to provide some Dummy Data
-    public List<VasOffer> getVasOfferList(@NonNull final GetBuyableOffersInput getBuyableOffersInput) {
+    private List<VasOffer> getVasOfferList(@NonNull final GetBuyableOffersInput getBuyableOffersInput) {
         List<VasOffer> VasOfferList = new ArrayList<>();
         VasOfferList.add(VasOffer.builder().aggregated(true).merchantId("DummyMerchant").build());
         String getBuyableOffersInputPinCode =
