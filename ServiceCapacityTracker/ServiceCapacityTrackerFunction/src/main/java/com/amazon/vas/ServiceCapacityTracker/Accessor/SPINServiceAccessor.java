@@ -9,11 +9,18 @@ import lombok.RequiredArgsConstructor;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class SPINServiceAccessor {
+    public List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutput(
+            @NonNull final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
+        //We can call the SPIN service here. Currently, I am calling the dummy function.
+        return getGetMerchantAggregatedDetailsOutputList(getMerchantAggregatedDetailsInputList);
+    }
+
     //Dummy Function to return some Dummy data
     private List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutputList
-    (@NonNull final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
+    (final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
         List<GetMerchantAggregatedDetailsOutput> list = new ArrayList<>();
         for (GetMerchantAggregatedDetailsInput getMerchantAggregatedDetailsInput :
                 getMerchantAggregatedDetailsInputList) {
@@ -25,11 +32,5 @@ public class SPINServiceAccessor {
                     .merchantAggregatedDetails(merchantAggregatedDetails).build());
         }
         return list;
-    }
-
-    public List<GetMerchantAggregatedDetailsOutput> getMerchantNames(
-            @NonNull final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
-        //We can call the SPIN service here. Currently, I am calling the dummy function.
-        return getGetMerchantAggregatedDetailsOutputList(getMerchantAggregatedDetailsInputList);
     }
 }

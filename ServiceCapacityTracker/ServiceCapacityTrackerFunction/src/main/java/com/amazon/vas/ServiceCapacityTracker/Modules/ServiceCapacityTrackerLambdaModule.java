@@ -13,7 +13,7 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import lombok.NonNull;
@@ -48,15 +48,13 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
 
     @Singleton
     @Provides
-    public MerchantDetailsBuilder buildMerchantDetailsBuilder(@NonNull SPINServiceAccessor spinServiceAccessor)
-    {
+    public MerchantDetailsBuilder buildMerchantDetailsBuilder(@NonNull SPINServiceAccessor spinServiceAccessor) {
         return new MerchantDetailsBuilder(spinServiceAccessor);
     }
 
     @Singleton
     @Provides
-    public CapacityDataBuilder buildCapacityDataBuilder(@NonNull DynamoDbAccessor dynamoDbAccessor)
-    {
+    public CapacityDataBuilder buildCapacityDataBuilder(@NonNull DynamoDbAccessor dynamoDbAccessor) {
         return new CapacityDataBuilder(dynamoDbAccessor);
     }
 
@@ -74,18 +72,18 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
 
     @Singleton
     @Provides
-    public DynamoDbAccessor buildDynamoDbAccessor(@NonNull DynamoDB dynamoDB) {
-        return new DynamoDbAccessor(dynamoDB);
+    public DynamoDbAccessor buildDynamoDbAccessor(@NonNull DynamoDBMapper dynamoDBMapper) {
+        return new DynamoDbAccessor(dynamoDBMapper);
     }
 
     @Singleton
     @Provides
-    public DynamoDB buildDynamoDB() {
+    public DynamoDBMapper buildDynamoDBMapper() {
         DefaultAWSCredentialsProviderChain credentialsProvider = new
                 DefaultAWSCredentialsProviderChain();
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
                 .withCredentials(credentialsProvider)
                 .withRegion(Regions.US_EAST_1).build();
-        return new DynamoDB(client);
+        return new DynamoDBMapper(client);
     }
 }

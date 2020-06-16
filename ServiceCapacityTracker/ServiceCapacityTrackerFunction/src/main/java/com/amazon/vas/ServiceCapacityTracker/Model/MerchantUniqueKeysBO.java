@@ -6,8 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class DynamoDbTableKeys
-{
+public class MerchantUniqueKeysBO {
     @NonNull
     String Id;
     @NonNull

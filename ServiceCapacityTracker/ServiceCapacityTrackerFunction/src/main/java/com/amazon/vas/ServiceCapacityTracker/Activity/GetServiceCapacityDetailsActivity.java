@@ -1,11 +1,10 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
-import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsInput;
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsOutput;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsInputBO;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -27,14 +26,14 @@ public class GetServiceCapacityDetailsActivity {
                 serviceCapacityDetailsBO);
     }
 
-    public GetServiceCapacityDetailsOutput translateToGetServiceCapacityDetailsOutput
-            (@NonNull final ServiceCapacityDetailsBO serviceCapacityDetailsBO) {
+    private GetServiceCapacityDetailsOutput translateToGetServiceCapacityDetailsOutput
+            (final ServiceCapacityDetailsBO serviceCapacityDetailsBO) {
         return GetServiceCapacityDetailsOutput.builder()
                 .storeList(serviceCapacityDetailsBO.getStoreList()).build();
     }
 
-    public ServiceCapacityDetailsInputBO translateToServiceCapacityDetailsInputBO
-            (@NonNull final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
+    private ServiceCapacityDetailsInputBO translateToServiceCapacityDetailsInputBO
+            (final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
         return ServiceCapacityDetailsInputBO.builder()
                 .skillType(getServiceCapacityDetailsInput.getSkillType())
                 .storeName(getServiceCapacityDetailsInput.getStoreName())

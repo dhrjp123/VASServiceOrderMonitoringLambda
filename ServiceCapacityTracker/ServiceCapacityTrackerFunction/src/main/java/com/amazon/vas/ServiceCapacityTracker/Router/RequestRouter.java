@@ -17,7 +17,7 @@ public class RequestRouter implements RequestHandler<Map<String, String>, Object
     private static final Gson GSON = new Gson();
     private GetServiceCapacityDetailsActivity getServiceCapacityDetailsActivity;
 
-    public String handleRequest(@NonNull final Map<String, String> input, Context context) {
+    public String handleRequest(@NonNull final Map<String, String> input, @NonNull final Context context) {
         getServiceCapacityDetailsActivity = getGetServiceCapacityDetailsActivityInstance();
         final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput
                 = translateInputToGetServiceCapacityDetailsInput(input);
@@ -26,18 +26,18 @@ public class RequestRouter implements RequestHandler<Map<String, String>, Object
         return translateGetServiceCapacityDetailsOutputToJson(getServiceCapacityDetailsOutput);
     }
 
-    public GetServiceCapacityDetailsInput translateInputToGetServiceCapacityDetailsInput(
-            @NonNull final Map<String, String> input) {
+    private GetServiceCapacityDetailsInput translateInputToGetServiceCapacityDetailsInput(
+            final Map<String, String> input) {
         return GetServiceCapacityDetailsInput.builder().skillType(input.get("skillType")).
                 marketplaceId(input.get("marketplaceId")).storeName(input.get("storeName")).build();
     }
 
-    public String translateGetServiceCapacityDetailsOutputToJson(
-            @NonNull final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
+    private String translateGetServiceCapacityDetailsOutputToJson(
+            final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
         return GSON.toJson(getServiceCapacityDetailsOutput, GetServiceCapacityDetailsOutput.class);
     }
 
-    public GetServiceCapacityDetailsActivity getGetServiceCapacityDetailsActivityInstance() {
+    private GetServiceCapacityDetailsActivity getGetServiceCapacityDetailsActivityInstance() {
         final Injector injector = Guice.createInjector(new ServiceCapacityTrackerLambdaModule());
         return injector.getInstance(GetServiceCapacityDetailsActivity.class);
     }

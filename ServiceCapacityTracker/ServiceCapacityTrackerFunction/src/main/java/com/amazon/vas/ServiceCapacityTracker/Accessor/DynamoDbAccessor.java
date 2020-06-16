@@ -1,38 +1,30 @@
 package com.amazon.vas.ServiceCapacityTracker.Accessor;
 
 import com.amazon.vas.ServiceCapacityTracker.Exception.DependencyFailureException;
-import com.amazonaws.services.dynamodbv2.document.BatchGetItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.TableKeysAndAttributes;
-import com.amazonaws.services.dynamodbv2.model.KeysAndAttributes;
-import lombok.AllArgsConstructor;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.google.common.collect.Lists;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class DynamoDbAccessor {
-    final private static String DYNAMODB_TABLE_NAME = "CapacityData";
     @NonNull
-    private DynamoDB dynamoDB;
+    private DynamoDBMapper dynamoDBMapper;
+    private static int BATCH_SIZE = 20;
 
-    public List<Item> getItemList(@NonNull final TableKeysAndAttributes tableKeysAndAttributes) {
+    public Map<String, List<Object>> getItems(@NonNull final List<Object> itemsToGet) {
         try {
-            List<Item> ItemList = new ArrayList<>();
-            Map<String, KeysAndAttributes> unprocessed = null;
-            BatchGetItemOutcome outcome = dynamoDB.batchGetItem(tableKeysAndAttributes);
-            do {
-                ItemList.addAll(outcome.getTableItems().get(DYNAMODB_TABLE_NAME));
-                unprocessed = outcome.getUnprocessedKeys();
-                if (!unprocessed.isEmpty())
-                    outcome = dynamoDB.batchGetItemUnprocessed(unprocessed);
-            } while (!unprocessed.isEmpty());
-            return ItemList;
+            List<List<Object>> itemsToGetBatchPartitions = Lists.partition(itemsToGet, BATCH_SIZE);
+            Map<String, List<Object>> capacityItemMap = new HashMap<>();
+            for (int batch_partition_idx = 0; batch_partition_idx < itemsToGetBatchPartitions.size();
+                 batch_partition_idx++)
+                capacityItemMap.putAll(dynamoDBMapper.batchLoad(itemsToGetBatchPartitions.get(batch_partition_idx)));
+            return capacityItemMap;
         } catch (Exception e) {
             throw new DependencyFailureException(e);
         }

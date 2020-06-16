@@ -1,54 +1,57 @@
 package com.amazon.vas.ServiceCapacityTracker.Builder;
 
 import com.amazon.vas.ServiceCapacityTracker.Accessor.SPINServiceAccessor;
-import com.amazon.vas.ServiceCapacityTracker.Model.*;
-import lombok.AllArgsConstructor;
+import com.amazon.vas.ServiceCapacityTracker.Model.GetMerchantAggregatedDetailsInput;
+import com.amazon.vas.ServiceCapacityTracker.Model.GetMerchantAggregatedDetailsOutput;
+import com.amazon.vas.ServiceCapacityTracker.Model.MerchantDetailsBO;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
-public class MerchantDetailsBuilder
-{
+public class MerchantDetailsBuilder {
     @NonNull
     private final SPINServiceAccessor spinServiceAccessor;
-    public List<MerchantDetailsBO> getUnderlyingMerchants(@NonNull MerchantDetailsBuilderInput merchantDetailsBuilderInput)
-    {
+
+    public List<MerchantDetailsBO> getMerchants(@NonNull final String asin, @NonNull final String pinCode,
+                                                @NonNull final String marketplaceId,
+                                                @NonNull final List<String> merchantsId) {
+        final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList =
+                spinServiceAccessor
+                        .getGetMerchantAggregatedDetailsOutput(translateToGetMerchantAggregatedDetailsInputList(
+                                merchantsId, marketplaceId));
+        final List<String> merchantsName =
+                getMerchantNamesFromGetMerchantAggregatedDetailsOutput(getMerchantAggregatedDetailsOutputList);
         List<MerchantDetailsBO> merchantList = new ArrayList<>();
-        final List<String> underlyingMerchantsName = getUnderlyingMerchantsName(merchantDetailsBuilderInput.getUnderlyingMerchantsId()
-                , merchantDetailsBuilderInput.getMarketplaceId());
-        for (int merchant_idx = 0; merchant_idx < merchantDetailsBuilderInput.getUnderlyingMerchantsId().size(); merchant_idx++) {
-            MerchantDetailsBO merchantDetailsBO = MerchantDetailsBO.builder()
-                    .merchantName(underlyingMerchantsName.get(merchant_idx))
-                    .merchantId(merchantDetailsBuilderInput.getUnderlyingMerchantsId().get(merchant_idx))
-                    .asin(merchantDetailsBuilderInput.getAsin()).pinCode(merchantDetailsBuilderInput.getPinCode()).build();
+        for (int merchant_idx = 0; merchant_idx < merchantsId.size(); merchant_idx++) {
+            MerchantDetailsBO merchantDetailsBO = MerchantDetailsBO.builder().asin(asin).pinCode(pinCode)
+                    .merchantId(merchantsId.get(merchant_idx))
+                    .merchantName(merchantsName.get(merchant_idx)).build();
             merchantList.add(merchantDetailsBO);
         }
         return merchantList;
     }
-    public List<String> getUnderlyingMerchantsName(@NonNull final List<String> underlyingMerchantsId,
-                                                   String marketplaceId) {
+
+    private List<GetMerchantAggregatedDetailsInput> translateToGetMerchantAggregatedDetailsInputList(
+            final List<String> merchantsId, final String marketplaceId) {
         List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList = new ArrayList<>();
-        for (String underlyingMerchantId : underlyingMerchantsId) {
+        for (String merchantId : merchantsId) {
             getMerchantAggregatedDetailsInputList.add(GetMerchantAggregatedDetailsInput.builder()
-                    .encryptedMerchantId(underlyingMerchantId)
+                    .encryptedMerchantId(merchantId)
                     .encryptedMarketplaceId(marketplaceId).build());
         }
-        final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList =
-                spinServiceAccessor.getMerchantNames(getMerchantAggregatedDetailsInputList);
-        return getMerchantNamesFromGetMerchantAggregatedDetailsOutput(getMerchantAggregatedDetailsOutputList);
+        return getMerchantAggregatedDetailsInputList;
     }
 
-    public List<String> getMerchantNamesFromGetMerchantAggregatedDetailsOutput
-            (@NonNull final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList) {
-        List<String> merchantNameList = new ArrayList<>();
+    private List<String> getMerchantNamesFromGetMerchantAggregatedDetailsOutput
+            (final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList) {
+        List<String> merchantsName = new ArrayList<>();
         for (GetMerchantAggregatedDetailsOutput getMerchantAggregatedDetailsOutput :
                 getMerchantAggregatedDetailsOutputList)
-            merchantNameList.add(getMerchantAggregatedDetailsOutput.getMerchantAggregatedDetails().getMerchantName());
-        return merchantNameList;
+            merchantsName.add(getMerchantAggregatedDetailsOutput.getMerchantAggregatedDetails().getMerchantName());
+        return merchantsName;
     }
 }

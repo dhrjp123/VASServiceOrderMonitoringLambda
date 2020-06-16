@@ -8,10 +8,16 @@ import lombok.RequiredArgsConstructor;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class VOSServiceAccessor {
+    public List<VasOffer> getVasOffers(@NonNull final GetBuyableOffersInput getBuyableOffersInput) {
+        //We can call the VOS service from here. Currently calling the dummy function.
+        return getVasOfferList(getBuyableOffersInput);
+    }
+
     //Dummy Function to provide some Dummy Data
-    private List<VasOffer> getVasOfferList(@NonNull final GetBuyableOffersInput getBuyableOffersInput) {
+    private List<VasOffer> getVasOfferList(final GetBuyableOffersInput getBuyableOffersInput) {
         List<VasOffer> VasOfferList = new ArrayList<>();
         VasOfferList.add(VasOffer.builder().aggregated(true).merchantId("DummyMerchant").build());
         String getBuyableOffersInputPinCode =
@@ -33,10 +39,5 @@ public class VOSServiceAccessor {
                 VasOfferList.add(VasOffer.builder().merchantId("MID6").aggregated(false).build());
         }
         return VasOfferList;
-    }
-
-    public List<VasOffer> getUnderlyingMerchantsId(@NonNull final GetBuyableOffersInput getBuyableOffersInput) {
-        //We can call the VOS service from here. Currently calling the dummy function.
-        return getVasOfferList(getBuyableOffersInput);
     }
 }
