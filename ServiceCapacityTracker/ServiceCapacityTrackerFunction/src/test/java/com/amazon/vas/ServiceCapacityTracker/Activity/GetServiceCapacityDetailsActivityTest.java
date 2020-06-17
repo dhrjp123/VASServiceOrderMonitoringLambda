@@ -1,6 +1,8 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
+import com.amazon.vas.ServiceCapacityTracker.Constants.ConstantsClass;
+import com.amazon.vas.ServiceCapacityTracker.Exception.InvalidInputException;
 import com.amazon.vas.ServiceCapacityTracker.Model.*;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -18,17 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class GetServiceCapacityDetailsActivityTest {
-    private static final String STORE1_STORE_NAME = "Delhi";
-    private static final String STORE1_MERCHANT_ID = "CMID1";
-    private static final String STORE2_STORE_NAME = "Jaipur";
-    private static final String STORE2_MERCHANT_ID = "CMID2";
-    private static final int DAY1_TOTAL_CAPACITY = 23;
-    private static final int DAY1_AVAILABLE_CAPACITY = 14;
-    private static final int DAY2_TOTAL_CAPACITY = 13;
-    private static final int DAY2_AVAILABLE_CAPACITY = 4;
-    final private static String SKILL_TYPE = "TV Installation";
-    final private static String STORE_NAME = "";
-    final private static String MARKETPLACE_ID = "India";
     @Mock
     private ServiceCapacityDetailsComponent serviceCapacityDetailsComponent;
     @InjectMocks
@@ -40,13 +31,14 @@ public class GetServiceCapacityDetailsActivityTest {
     }
 
     @Test
-    public void testHandleRequest_withValidInput_thenSuccessfulResponse() {
+    public void testHandleRequest_whenValidInputIsPassed_thenSuccessfulResponse() {
         GetServiceCapacityDetailsInput getServiceCapacityDetailsInput =
-                getDefaultServiceCapacityTrackerActivityInput();
+                getDefaultGetServiceCapacityDetailsInput();
         GetServiceCapacityDetailsOutput expectedGetServiceCapacityDetailsOutput =
-                getDefaultServiceCapacityTrackerActivityOutput();
-        when(serviceCapacityDetailsComponent.trackCapacity(any(ServiceCapacityDetailsInputBO.class)))
-                .thenReturn(translateServiceCapacityTrackerActivityOutputToServiceCapacityTrackerComponentResponseBO
+                getDefaultGetServiceCapacityDetailsOutput();
+        when(serviceCapacityDetailsComponent
+                .trackCapacity(translateToServiceCapacityDetailsInputBO(getServiceCapacityDetailsInput)))
+                .thenReturn(translateToServiceCapacityDetailsBO
                         (expectedGetServiceCapacityDetailsOutput));
         GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput = getServiceCapacityDetailsActivity.
                 handleRequest(getServiceCapacityDetailsInput);
@@ -54,34 +46,51 @@ public class GetServiceCapacityDetailsActivityTest {
         verify(serviceCapacityDetailsComponent).trackCapacity(any(ServiceCapacityDetailsInputBO.class));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testHandleRequest_withNullInput() {
-        getServiceCapacityDetailsActivity.handleRequest(null);
+    @Test(expected = InvalidInputException.class)
+    public void testHandleRequest_whenInputIsPassedWithEmptySkillType_thenThrowInvalidInputException() {
+        getServiceCapacityDetailsActivity.handleRequest(getGetServiceCapacityDetailsInputWithEmptySkillType());
     }
 
-    public GetServiceCapacityDetailsInput getDefaultServiceCapacityTrackerActivityInput() {
-        return GetServiceCapacityDetailsInput.builder().skillType(SKILL_TYPE).storeName(STORE_NAME)
-                .marketplaceId(MARKETPLACE_ID).build();
+    private GetServiceCapacityDetailsInput getGetServiceCapacityDetailsInputWithEmptySkillType() {
+        return GetServiceCapacityDetailsInput.builder().skillType("").storeName(ConstantsClass.STORE_NAME)
+                .marketplaceId(ConstantsClass.MARKETPLACE_ID).build();
     }
 
-    public GetServiceCapacityDetailsOutput getDefaultServiceCapacityTrackerActivityOutput() {
+    private GetServiceCapacityDetailsInput getDefaultGetServiceCapacityDetailsInput() {
+        return GetServiceCapacityDetailsInput.builder().skillType(ConstantsClass.SKILL_TYPE)
+                .storeName(ConstantsClass.STORE_NAME)
+                .marketplaceId(ConstantsClass.MARKETPLACE_ID).build();
+    }
+
+    private GetServiceCapacityDetailsOutput getDefaultGetServiceCapacityDetailsOutput() {
         ImmutableList<StoreCapacityBO> capacityList = ImmutableList.of(StoreCapacityBO.builder()
-                        .totalCapacity(DAY1_TOTAL_CAPACITY).availableCapacity(DAY1_AVAILABLE_CAPACITY).build(),
-                StoreCapacityBO.builder().totalCapacity(DAY2_TOTAL_CAPACITY)
-                        .availableCapacity(DAY2_AVAILABLE_CAPACITY).build());
-        StoreCapacityDetailsBO storeCapacityDetailsBO1 = StoreCapacityDetailsBO.builder().storeName(STORE1_STORE_NAME)
-                .merchantId(STORE1_MERCHANT_ID).capacityList(capacityList).build();
-        StoreCapacityDetailsBO storeCapacityDetailsBO2 = StoreCapacityDetailsBO.builder().storeName(STORE2_STORE_NAME)
-                .merchantId(STORE2_MERCHANT_ID).capacityList(capacityList).build();
+                        .totalCapacity(ConstantsClass.DAY1_TOTAL_CAPACITY)
+                        .availableCapacity(ConstantsClass.DAY1_AVAILABLE_CAPACITY).build(),
+                StoreCapacityBO.builder().totalCapacity(ConstantsClass.DAY2_TOTAL_CAPACITY)
+                        .availableCapacity(ConstantsClass.DAY2_AVAILABLE_CAPACITY).build());
+        StoreCapacityDetailsBO storeCapacityDetailsBO1 =
+                StoreCapacityDetailsBO.builder().storeName(ConstantsClass.STORE1_STORE_NAME)
+                        .merchantId(ConstantsClass.STORE1_MERCHANT_ID).capacityList(capacityList).build();
+        StoreCapacityDetailsBO storeCapacityDetailsBO2 =
+                StoreCapacityDetailsBO.builder().storeName(ConstantsClass.STORE2_STORE_NAME)
+                        .merchantId(ConstantsClass.STORE2_MERCHANT_ID).capacityList(capacityList).build();
         List<StoreCapacityDetailsBO> storeList = new ArrayList<>();
         storeList.add(storeCapacityDetailsBO1);
         storeList.add(storeCapacityDetailsBO2);
         return GetServiceCapacityDetailsOutput.builder().storeList(storeList).build();
     }
 
-    public ServiceCapacityDetailsBO translateServiceCapacityTrackerActivityOutputToServiceCapacityTrackerComponentResponseBO
-            (GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
+    private ServiceCapacityDetailsBO translateToServiceCapacityDetailsBO
+            (final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
         return ServiceCapacityDetailsBO.builder()
                 .storeList(getServiceCapacityDetailsOutput.getStoreList()).build();
+    }
+
+    private ServiceCapacityDetailsInputBO translateToServiceCapacityDetailsInputBO
+            (final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
+        return ServiceCapacityDetailsInputBO.builder()
+                .skillType(getServiceCapacityDetailsInput.getSkillType())
+                .storeName(getServiceCapacityDetailsInput.getStoreName())
+                .marketplaceId(getServiceCapacityDetailsInput.getMarketplaceId()).build();
     }
 }

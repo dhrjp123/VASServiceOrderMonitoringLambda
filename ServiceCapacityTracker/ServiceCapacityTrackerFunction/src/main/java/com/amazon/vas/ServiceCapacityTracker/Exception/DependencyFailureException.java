@@ -5,7 +5,7 @@ public class DependencyFailureException extends RuntimeException {
         super();
     }
 
-    public DependencyFailureException(String errorMessage) {
+    public DependencyFailureException(final String errorMessage) {
         super(errorMessage);
     }
 

@@ -1,6 +1,7 @@
 package com.amazon.vas.ServiceCapacityTracker.Activity;
 
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
+import com.amazon.vas.ServiceCapacityTracker.Exception.InvalidInputException;
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsInput;
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsOutput;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBO;
@@ -17,6 +18,7 @@ public class GetServiceCapacityDetailsActivity {
 
     public GetServiceCapacityDetailsOutput handleRequest(
             @NonNull final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
+        validateInput(getServiceCapacityDetailsInput);
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
                 translateToServiceCapacityDetailsInputBO(
                         getServiceCapacityDetailsInput);
@@ -38,5 +40,11 @@ public class GetServiceCapacityDetailsActivity {
                 .skillType(getServiceCapacityDetailsInput.getSkillType())
                 .storeName(getServiceCapacityDetailsInput.getStoreName())
                 .marketplaceId(getServiceCapacityDetailsInput.getMarketplaceId()).build();
+    }
+
+    private void validateInput(final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
+        if (getServiceCapacityDetailsInput.getSkillType() == null ||
+                getServiceCapacityDetailsInput.getSkillType().equals(""))
+            throw new InvalidInputException("Skill Type can't be null");
     }
 }
