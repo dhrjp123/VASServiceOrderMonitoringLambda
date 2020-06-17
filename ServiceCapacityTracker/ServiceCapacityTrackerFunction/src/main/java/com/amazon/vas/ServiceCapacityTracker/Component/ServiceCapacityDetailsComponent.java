@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ServiceCapacityDetailsComponent {
@@ -53,6 +50,7 @@ public class ServiceCapacityDetailsComponent {
                     .capacityList(capacityList).build();
             storeList.add(storeCapacityDetailsBO);
         }
+        Collections.sort(storeList, Comparator.comparing(StoreCapacityDetailsBO::getStoreName));
         return ServiceCapacityDetailsBO.builder().storeList(storeList).build();
     }
 
