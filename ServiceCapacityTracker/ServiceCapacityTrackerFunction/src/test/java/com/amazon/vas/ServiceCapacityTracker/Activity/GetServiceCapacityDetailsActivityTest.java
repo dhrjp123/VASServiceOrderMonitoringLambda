@@ -3,7 +3,13 @@ package com.amazon.vas.ServiceCapacityTracker.Activity;
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
 import com.amazon.vas.ServiceCapacityTracker.Constants.ConstantsClass;
 import com.amazon.vas.ServiceCapacityTracker.Exception.InvalidInputException;
-import com.amazon.vas.ServiceCapacityTracker.Model.*;
+import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsInput;
+import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsOutput;
+import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityBO;
+import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityDetailsBO;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsInputBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.StoreCapacityBOBuilder;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,18 +37,18 @@ public class GetServiceCapacityDetailsActivityTest {
 
     @Test
     public void testHandleRequest_whenValidInputIsPassed_thenSuccessfulResponse() {
-        GetServiceCapacityDetailsInput getServiceCapacityDetailsInput =
+        final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput =
                 getDefaultGetServiceCapacityDetailsInput();
-        GetServiceCapacityDetailsOutput expectedGetServiceCapacityDetailsOutput =
+        final GetServiceCapacityDetailsOutput expectedGetServiceCapacityDetailsOutput =
                 getDefaultGetServiceCapacityDetailsOutput();
         when(serviceCapacityDetailsComponent
-                .trackCapacity(translateToServiceCapacityDetailsInputBO(getServiceCapacityDetailsInput)))
-                .thenReturn(translateToServiceCapacityDetailsBO
-                        (expectedGetServiceCapacityDetailsOutput));
-        GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput = getServiceCapacityDetailsActivity.
+                .trackCapacity(new ServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build()))
+                .thenReturn(new ServiceCapacityDetailsBOBuilder().forAggregatedMerchants().build());
+        final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput = getServiceCapacityDetailsActivity.
                 handleRequest(getServiceCapacityDetailsInput);
         assertEquals(expectedGetServiceCapacityDetailsOutput, getServiceCapacityDetailsOutput);
-        verify(serviceCapacityDetailsComponent).trackCapacity(any(ServiceCapacityDetailsInputBO.class));
+        verify(serviceCapacityDetailsComponent).trackCapacity(new ServiceCapacityDetailsInputBOBuilder()
+                .withEmptyStoreName().build());
     }
 
     @Test(expected = InvalidInputException.class)
@@ -52,45 +57,23 @@ public class GetServiceCapacityDetailsActivityTest {
     }
 
     private GetServiceCapacityDetailsInput getGetServiceCapacityDetailsInputWithEmptySkillType() {
-        return GetServiceCapacityDetailsInput.builder().skillType("").storeName(ConstantsClass.STORE_NAME)
-                .marketplaceId(ConstantsClass.MARKETPLACE_ID).build();
+        return GetServiceCapacityDetailsInput.builder().skillType("").storeName(ConstantsClass.EMPTY_STORE_NAME)
+                .marketplaceId(ConstantsClass.MARKETPLACE_ID).numberOfDays(ConstantsClass.NUMBER_OF_COLUMNS).build();
     }
 
     private GetServiceCapacityDetailsInput getDefaultGetServiceCapacityDetailsInput() {
         return GetServiceCapacityDetailsInput.builder().skillType(ConstantsClass.SKILL_TYPE)
-                .storeName(ConstantsClass.STORE_NAME)
-                .marketplaceId(ConstantsClass.MARKETPLACE_ID).build();
+                .storeName(ConstantsClass.EMPTY_STORE_NAME)
+                .marketplaceId(ConstantsClass.MARKETPLACE_ID).numberOfDays(ConstantsClass.NUMBER_OF_COLUMNS).build();
     }
 
     private GetServiceCapacityDetailsOutput getDefaultGetServiceCapacityDetailsOutput() {
-        ImmutableList<StoreCapacityBO> capacityList = ImmutableList.of(StoreCapacityBO.builder()
-                        .totalCapacity(ConstantsClass.DAY1_TOTAL_CAPACITY)
-                        .availableCapacity(ConstantsClass.DAY1_AVAILABLE_CAPACITY).build(),
-                StoreCapacityBO.builder().totalCapacity(ConstantsClass.DAY2_TOTAL_CAPACITY)
-                        .availableCapacity(ConstantsClass.DAY2_AVAILABLE_CAPACITY).build());
-        StoreCapacityDetailsBO storeCapacityDetailsBO1 =
-                StoreCapacityDetailsBO.builder().storeName(ConstantsClass.STORE1_STORE_NAME)
-                        .merchantId(ConstantsClass.STORE1_MERCHANT_ID).capacityList(capacityList).build();
-        StoreCapacityDetailsBO storeCapacityDetailsBO2 =
-                StoreCapacityDetailsBO.builder().storeName(ConstantsClass.STORE2_STORE_NAME)
-                        .merchantId(ConstantsClass.STORE2_MERCHANT_ID).capacityList(capacityList).build();
-        List<StoreCapacityDetailsBO> storeList = new ArrayList<>();
-        storeList.add(storeCapacityDetailsBO1);
-        storeList.add(storeCapacityDetailsBO2);
+        List<StoreCapacityBO> capacityList = new ArrayList<>();
+        for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
+            capacityList.add(new StoreCapacityBOBuilder().build());
+        ImmutableList<StoreCapacityDetailsBO> storeList = ImmutableList.of(StoreCapacityDetailsBO.builder()
+                .storeName(ConstantsClass.AGGREGATED_MERCHANT_NAME).merchantId(ConstantsClass.AGGREGATED_MERCHANT_ID)
+                .capacityList(ImmutableList.copyOf(capacityList)).build());
         return GetServiceCapacityDetailsOutput.builder().storeList(storeList).build();
-    }
-
-    private ServiceCapacityDetailsBO translateToServiceCapacityDetailsBO
-            (final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
-        return ServiceCapacityDetailsBO.builder()
-                .storeList(getServiceCapacityDetailsOutput.getStoreList()).build();
-    }
-
-    private ServiceCapacityDetailsInputBO translateToServiceCapacityDetailsInputBO
-            (final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
-        return ServiceCapacityDetailsInputBO.builder()
-                .skillType(getServiceCapacityDetailsInput.getSkillType())
-                .storeName(getServiceCapacityDetailsInput.getStoreName())
-                .marketplaceId(getServiceCapacityDetailsInput.getMarketplaceId()).build();
     }
 }

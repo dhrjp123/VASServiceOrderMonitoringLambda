@@ -1,15 +1,15 @@
 package com.amazon.vas.ServiceCapacityTracker.Accessor;
 
-import com.amazonaws.services.dynamodbv2.document.BatchGetItemOutcome;
-import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.TableKeysAndAttributes;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.BatchGetItemResult;
+import com.amazon.vas.ServiceCapacityTracker.Constants.ConstantsClass;
+import com.amazon.vas.ServiceCapacityTracker.Exception.DependencyFailureException;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.CapacityDataItemBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMappingException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
@@ -19,24 +19,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class DynamoDbAccessorTest {
-    private static String ID = "AID1MID1473001";
-    private static String DATE = LocalDate.now().toString();
-    private static String ASIN = "AID1";
-    private static String MERCHANTID = "MID1";
-    private static String PINCODE = "473001";
-    private static String STOREID = "SID1";
-    private static String TOTALCAPACITY = "30";
-    private static String AVAILABLECAPACITY = "21";
-    final private static String DYNAMODB_TABLE_NAME = "CapacityData";
     @InjectMocks
     private DynamoDbAccessor dynamoDbAccessor;
     @Mock
-    private DynamoDB dynamoDB;
+    private DynamoDBMapper dynamoDBMapper;
 
     @Before
     public void setup() {
@@ -44,42 +32,34 @@ public class DynamoDbAccessorTest {
     }
 
     @Test
-    public void testGetCapacityData_withValidInput_thenSuccessfulResponse() {
-        TableKeysAndAttributes tableKeysAndAttributes = getDefaultTableKeysAndAttributes();
-        BatchGetItemResult batchGetItemResult = getDefaultBatchGetItemResult();
-        BatchGetItemOutcome expectedBatchGetItemOutcome = new BatchGetItemOutcome(batchGetItemResult);
-        List<Item> expectedCapacityDataItemList = expectedBatchGetItemOutcome.getTableItems().get(DYNAMODB_TABLE_NAME);
-        when(dynamoDB.batchGetItem(any(TableKeysAndAttributes.class)))
-                .thenReturn(expectedBatchGetItemOutcome);
-        BatchGetItemOutcome batchGetItemOutcome = dynamoDB.batchGetItem(tableKeysAndAttributes);
-        List<Item> capacityDataItemList = batchGetItemOutcome.getTableItems().get(DYNAMODB_TABLE_NAME);
-        assertEquals(expectedCapacityDataItemList.toString(), capacityDataItemList.toString());
-        verify(dynamoDB).batchGetItem(any(TableKeysAndAttributes.class));
+    public void testGetItems_whenValidInputIsPassed_thenSuccessfulResponse() {
+        final List<Object> itemsToGet = getDefaultItemsToGetList();
+        final Map<String, List<Object>> expectedCapacityItemMap = getDefaultCapacityItemMap();
+        Mockito.when(dynamoDBMapper.batchLoad(itemsToGet)).thenReturn(expectedCapacityItemMap);
+        final Map<String, List<Object>> capacityItemMap = dynamoDbAccessor.getItems(itemsToGet);
+        assertEquals(expectedCapacityItemMap, capacityItemMap);
+        Mockito.verify(dynamoDBMapper).batchLoad(itemsToGet);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testGetCapacityData_withNullInput() {
-        dynamoDbAccessor.getCapacityData(null);
+    @Test(expected = DependencyFailureException.class)
+    public void testGetItems_whenDynamoDBMapperThrowsException_thenThrowDependencyFailureException() {
+        final DynamoDBMappingException exception = new DynamoDBMappingException();
+        final List<Object> itemsToGet = getDefaultItemsToGetList();
+        Mockito.when(dynamoDBMapper.batchLoad(itemsToGet)).thenThrow(exception);
+        dynamoDbAccessor.getItems(itemsToGet);
     }
 
-    public TableKeysAndAttributes getDefaultTableKeysAndAttributes() {
-        TableKeysAndAttributes tableKeysAndAttributes = new TableKeysAndAttributes(DYNAMODB_TABLE_NAME);
-        tableKeysAndAttributes.addHashAndRangePrimaryKey("Id", ID, "Date", DATE);
-        return tableKeysAndAttributes;
+    private List<Object> getDefaultItemsToGetList() {
+        List<Object> itemsToGet = new ArrayList<>();
+        itemsToGet.add(new CapacityDataItemBuilder(LocalDate.now().toString()).build());
+        return itemsToGet;
     }
 
-    public BatchGetItemResult getDefaultBatchGetItemResult() {
-        List<Map<String, AttributeValue>> responseMapList = new ArrayList<>();
-        Map<String, AttributeValue> responseMap = new HashMap<>();
-        responseMap.put("Id", new AttributeValue().withS(ID));
-        responseMap.put("Date", new AttributeValue().withS(DATE));
-        responseMap.put("Asin", new AttributeValue().withS(ASIN));
-        responseMap.put("MerchantId", new AttributeValue().withS(MERCHANTID));
-        responseMap.put("PinCode", new AttributeValue().withS(PINCODE));
-        responseMap.put("StoreId", new AttributeValue().withS(STOREID));
-        responseMap.put("TotalCapacity", new AttributeValue().withN(TOTALCAPACITY));
-        responseMap.put("AvailableCapacity", new AttributeValue().withN(AVAILABLECAPACITY));
-        responseMapList.add(responseMap);
-        return new BatchGetItemResult().addResponsesEntry("CapacityData", responseMapList);
+    private Map<String, List<Object>> getDefaultCapacityItemMap() {
+        Map<String, List<Object>> capacityItemMap = new HashMap<>();
+        List<Object> itemsToReceive = new ArrayList<>();
+        itemsToReceive.add(new CapacityDataItemBuilder(LocalDate.now().toString()).withAllFields().build());
+        capacityItemMap.put(ConstantsClass.DYNAMODB_TABLE_NAME, itemsToReceive);
+        return capacityItemMap;
     }
 }

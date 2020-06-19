@@ -28,8 +28,8 @@ public class OfferDetailsBuilder {
     private List<OfferDetails> translateToOfferDetailsList(final List<VasOffer> vasOfferList) {
         List<OfferDetails> offerDetailsList = new ArrayList<>();
         for (VasOffer vasOffer : vasOfferList) {
-            if (!vasOffer.isAggregated())
-                offerDetailsList.add(OfferDetails.builder().merchantId(vasOffer.getMerchantId()).build());
+            offerDetailsList.add(OfferDetails.builder().merchantId(vasOffer.getMerchantId())
+                    .isAggregated(vasOffer.isAggregated()).build());
         }
         return offerDetailsList;
     }

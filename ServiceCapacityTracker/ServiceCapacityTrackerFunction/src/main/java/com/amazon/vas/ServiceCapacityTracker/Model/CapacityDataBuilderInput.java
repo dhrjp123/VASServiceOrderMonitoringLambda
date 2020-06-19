@@ -6,13 +6,11 @@ import lombok.Value;
 
 @Value
 @Builder
-public class GetServiceCapacityDetailsInput {
+public class CapacityDataBuilderInput {
     @NonNull
-    String skillType;
+    private String merchantId;
     @NonNull
-    String storeName;
+    private String asin;
     @NonNull
-    String marketplaceId;
-    @NonNull
-    int numberOfDays;
+    private String pinCode;
 }

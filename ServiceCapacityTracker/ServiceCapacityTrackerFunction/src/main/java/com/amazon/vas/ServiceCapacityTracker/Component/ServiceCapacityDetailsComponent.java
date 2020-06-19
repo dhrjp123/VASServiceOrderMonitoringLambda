@@ -5,6 +5,7 @@ import com.amazon.vas.ServiceCapacityTracker.Builder.MerchantDetailsBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Builder.OfferDetailsBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Config.AppConfig;
 import com.amazon.vas.ServiceCapacityTracker.Model.*;
+import com.amazonaws.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -14,7 +15,6 @@ import java.util.*;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class ServiceCapacityDetailsComponent {
-    private static final int NUMBER_OF_COLUMNS = 7;
     @NonNull
     private final MerchantDetailsBuilder merchantDetailsBuilder;
     @NonNull
@@ -27,22 +27,31 @@ public class ServiceCapacityDetailsComponent {
     public ServiceCapacityDetailsBO trackCapacity
             (@NonNull final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO) {
         final List<MerchantDetailsBO> merchantList = getMerchantList(serviceCapacityDetailsInputBO);
-        final Map<MerchantUniqueKeysBO, StoreCapacityBO> storeCapacityMap =
-                capacityDataBuilder.getCapacityMap(merchantList);
-        return createResponse(merchantList, storeCapacityMap);
+        final List<CapacityDataBuilderInput> capacityDataBuilderInputList = getCapacityDataBuilderInputList(
+                serviceCapacityDetailsInputBO, merchantList);
+        final Map<CapacityDataItemUniqueKeys, StoreCapacityBO> storeCapacityMap =
+                capacityDataBuilder.getCapacityMap(capacityDataBuilderInputList
+                        , serviceCapacityDetailsInputBO.getNumberOfDays());
+        return createResponse(merchantList, storeCapacityMap, capacityDataBuilderInputList,
+                serviceCapacityDetailsInputBO.getNumberOfDays());
     }
 
     private ServiceCapacityDetailsBO createResponse(final List<MerchantDetailsBO> merchantList,
-                                                    final Map<MerchantUniqueKeysBO, StoreCapacityBO> storeCapacityMap) {
+                                                    final Map<CapacityDataItemUniqueKeys, StoreCapacityBO> storeCapacityMap,
+                                                    final List<CapacityDataBuilderInput> capacityDataBuilderInputList,
+                                                    int numberOfDays) {
         List<StoreCapacityDetailsBO> storeList = new ArrayList<>();
-        for (MerchantDetailsBO merchantDetailsBO : merchantList) {
+        for (int idx = 0; idx < merchantList.size(); idx++) {
+            MerchantDetailsBO merchantDetailsBO = merchantList.get(idx);
+            CapacityDataBuilderInput capacityDataBuilderInput = capacityDataBuilderInputList.get(idx);
             final LocalDate today = LocalDate.now();
             List<StoreCapacityBO> capacityList = new ArrayList<>();
             final String Id =
-                    merchantDetailsBO.getAsin() + merchantDetailsBO.getMerchantId() + merchantDetailsBO.getPinCode();
-            for (int date_idx = 0; date_idx < NUMBER_OF_COLUMNS; date_idx++) {
+                    capacityDataBuilderInput.getAsin() + merchantDetailsBO.getMerchantId() +
+                            capacityDataBuilderInput.getPinCode();
+            for (int date_idx = 0; date_idx < numberOfDays; date_idx++) {
                 capacityList.add(storeCapacityMap.get(
-                        MerchantUniqueKeysBO.builder().Id(Id).date(today.plusDays(date_idx).toString()).build()));
+                        CapacityDataItemUniqueKeys.builder().Id(Id).date(today.plusDays(date_idx).toString()).build()));
             }
             StoreCapacityDetailsBO storeCapacityDetailsBO = StoreCapacityDetailsBO.builder()
                     .storeName(merchantDetailsBO.getMerchantName())
@@ -59,40 +68,67 @@ public class ServiceCapacityDetailsComponent {
         return asinMap.get(skillType);
     }
 
+    private String getPinCodeFromStoreName(final String storeName) {
+        final Map<String, CityDetailsBO> cityMap = appConfig.getCityMapper();
+        return cityMap.get(storeName).getPinCode();
+    }
+
+    private List<CapacityDataBuilderInput> getCapacityDataBuilderInputList(
+            ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO
+            , List<MerchantDetailsBO> merchantList) {
+        final String asin = getAsinFromSkillType(serviceCapacityDetailsInputBO.getSkillType());
+        final String storeName = serviceCapacityDetailsInputBO.getStoreName();
+        List<CapacityDataBuilderInput> capacityDataBuilderInputList = new ArrayList<>();
+        if (StringUtils.isNullOrEmpty(storeName)) {
+            for (MerchantDetailsBO merchant : merchantList)
+                capacityDataBuilderInputList.add(CapacityDataBuilderInput.builder().merchantId(merchant.getMerchantId())
+                        .asin(asin).pinCode(getPinCodeFromStoreName(merchant.getMerchantName())).build());
+        } else {
+            final String pinCode = getPinCodeFromStoreName(storeName);
+            for (MerchantDetailsBO merchant : merchantList)
+                capacityDataBuilderInputList.add(CapacityDataBuilderInput.builder().merchantId(merchant.getMerchantId())
+                        .asin(asin).pinCode(pinCode).build());
+        }
+        return capacityDataBuilderInputList;
+    }
+
     private List<MerchantDetailsBO> getMerchantList(
             final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO) {
         final Map<String, CityDetailsBO> cityMap = appConfig.getCityMapper();
         String storeName = serviceCapacityDetailsInputBO.getStoreName();
         String asin = getAsinFromSkillType(serviceCapacityDetailsInputBO.getSkillType());
-        if (storeName == null || storeName.equals(""))
-            return getMerchantListFromCityMap(cityMap, asin);
+        if (StringUtils.isNullOrEmpty(storeName))
+            return getAggregatedMerchantDetailsList(cityMap, asin);
         else {
             final String pinCode = cityMap.get(storeName).getPinCode();
             final List<OfferDetails> offerDetailsList =
                     offerDetailsBuilder
                             .getOfferDetailsList(asin, pinCode, serviceCapacityDetailsInputBO.getMarketplaceId());
             final List<String> underlyingMerchantsId = getIndividualMerchantsId(offerDetailsList);
-            return merchantDetailsBuilder.getMerchants(asin, pinCode,
-                    serviceCapacityDetailsInputBO.getMarketplaceId(), underlyingMerchantsId);
+            return merchantDetailsBuilder.getMerchants(serviceCapacityDetailsInputBO.getMarketplaceId(),
+                    underlyingMerchantsId);
         }
     }
 
-    private List<MerchantDetailsBO> getMerchantListFromCityMap(final Map<String, CityDetailsBO> cityMap, String asin) {
+    private List<MerchantDetailsBO> getAggregatedMerchantDetailsList(final Map<String, CityDetailsBO> cityMap,
+                                                                     String asin) {
         List<MerchantDetailsBO> merchantList = new ArrayList<>();
         final Iterator<String> cityIterator = cityMap.keySet().iterator();
         while (cityIterator.hasNext()) {
             String cityName = cityIterator.next();
             CityDetailsBO cityDetailsBO = cityMap.get(cityName);
-            merchantList.add(MerchantDetailsBO.builder().merchantName(cityName).asin(asin)
-                    .merchantId(cityDetailsBO.getMerchantId()).pinCode(cityDetailsBO.getPinCode()).build());
+            merchantList.add(MerchantDetailsBO.builder().merchantName(cityName)
+                    .merchantId(cityDetailsBO.getMerchantId()).build());
         }
         return merchantList;
     }
 
     private List<String> getIndividualMerchantsId(final List<OfferDetails> offerDetailsList) {
         List<String> individualMerchantsIdList = new ArrayList<>();
-        for (OfferDetails offerDetails : offerDetailsList)
-            individualMerchantsIdList.add(offerDetails.getMerchantId());
+        for (OfferDetails offerDetails : offerDetailsList) {
+            if (!offerDetails.isAggregated())
+                individualMerchantsIdList.add(offerDetails.getMerchantId());
+        }
         return individualMerchantsIdList;
     }
 }

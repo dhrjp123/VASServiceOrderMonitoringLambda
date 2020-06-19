@@ -9,4 +9,6 @@ import lombok.Value;
 public class OfferDetails {
     @NonNull
     String merchantId;
+    @NonNull
+    boolean isAggregated;
 }

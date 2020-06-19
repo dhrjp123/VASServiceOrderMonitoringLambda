@@ -11,8 +11,4 @@ public class MerchantDetailsBO {
     String merchantName;
     @NonNull
     String merchantId;
-    @NonNull
-    String pinCode;
-    @NonNull
-    String asin;
 }

@@ -17,9 +17,9 @@ public class DynamoDbAccessor {
     private DynamoDBMapper dynamoDBMapper;
     private static int BATCH_SIZE = 20;
 
-    public Map<String, List<Object>> getItems(@NonNull final List<Object> itemsToGet) {
+    public Map<String, List<Object>> getItems(@NonNull final List<Object> items) {
         try {
-            List<List<Object>> itemsToGetBatchPartitions = Lists.partition(itemsToGet, BATCH_SIZE);
+            List<List<Object>> itemsToGetBatchPartitions = Lists.partition(items, BATCH_SIZE);
             Map<String, List<Object>> capacityItemMap = new HashMap<>();
             for (int batch_partition_idx = 0; batch_partition_idx < itemsToGetBatchPartitions.size();
                  batch_partition_idx++)

@@ -25,4 +25,9 @@ public class CapacityDataItem {
     private Integer totalCapacity;
     @DynamoDBAttribute(attributeName = "AvailableCapacity")
     private Integer availableCapacity;
+
+    public String getId() {
+        this.id = asin + merchantId + pinCode;
+        return id;
+    }
 }

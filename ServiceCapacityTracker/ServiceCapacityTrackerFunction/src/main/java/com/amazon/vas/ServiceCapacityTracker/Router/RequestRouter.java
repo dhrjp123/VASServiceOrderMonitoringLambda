@@ -29,7 +29,8 @@ public class RequestRouter implements RequestHandler<Map<String, String>, Object
     private GetServiceCapacityDetailsInput translateInputToGetServiceCapacityDetailsInput(
             final Map<String, String> input) {
         return GetServiceCapacityDetailsInput.builder().skillType(input.get("skillType")).
-                marketplaceId(input.get("marketplaceId")).storeName(input.get("storeName")).build();
+                marketplaceId(input.get("marketplaceId")).storeName(input.get("storeName"))
+                .numberOfDays(Integer.parseInt(input.get("numberOfDays"))).build();
     }
 
     private String translateGetServiceCapacityDetailsOutputToJson(

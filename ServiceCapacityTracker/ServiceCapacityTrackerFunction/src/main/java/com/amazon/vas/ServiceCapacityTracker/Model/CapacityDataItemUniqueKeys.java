@@ -6,7 +6,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class MerchantUniqueKeysBO {
+public class CapacityDataItemUniqueKeys {
     @NonNull
     String Id;
     @NonNull

@@ -13,4 +13,6 @@ public class ServiceCapacityDetailsInputBO {
     String storeName;
     @NonNull
     String marketplaceId;
+    @NonNull
+    int numberOfDays;
 }

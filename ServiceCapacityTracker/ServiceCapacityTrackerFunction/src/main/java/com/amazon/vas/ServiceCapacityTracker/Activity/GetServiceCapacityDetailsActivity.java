@@ -6,6 +6,7 @@ import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsInpu
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsOutput;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsInputBO;
+import com.amazonaws.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -39,12 +40,12 @@ public class GetServiceCapacityDetailsActivity {
         return ServiceCapacityDetailsInputBO.builder()
                 .skillType(getServiceCapacityDetailsInput.getSkillType())
                 .storeName(getServiceCapacityDetailsInput.getStoreName())
-                .marketplaceId(getServiceCapacityDetailsInput.getMarketplaceId()).build();
+                .marketplaceId(getServiceCapacityDetailsInput.getMarketplaceId())
+                .numberOfDays(getServiceCapacityDetailsInput.getNumberOfDays()).build();
     }
 
     private void validateInput(final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
-        if (getServiceCapacityDetailsInput.getSkillType() == null ||
-                getServiceCapacityDetailsInput.getSkillType().equals(""))
+        if (StringUtils.isNullOrEmpty(getServiceCapacityDetailsInput.getSkillType()))
             throw new InvalidInputException("Skill Type can't be null");
     }
 }

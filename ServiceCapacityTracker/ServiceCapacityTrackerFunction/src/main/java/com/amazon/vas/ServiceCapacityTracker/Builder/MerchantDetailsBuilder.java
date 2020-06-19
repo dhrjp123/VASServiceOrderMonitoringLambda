@@ -16,22 +16,18 @@ public class MerchantDetailsBuilder {
     @NonNull
     private final SPINServiceAccessor spinServiceAccessor;
 
-    public List<MerchantDetailsBO> getMerchants(@NonNull final String asin, @NonNull final String pinCode,
-                                                @NonNull final String marketplaceId,
+    public List<MerchantDetailsBO> getMerchants(@NonNull final String marketplaceId,
                                                 @NonNull final List<String> merchantsId) {
         final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList =
                 spinServiceAccessor
                         .getGetMerchantAggregatedDetailsOutput(translateToGetMerchantAggregatedDetailsInputList(
                                 merchantsId, marketplaceId));
-        final List<String> merchantsName =
-                getMerchantNamesFromGetMerchantAggregatedDetailsOutput(getMerchantAggregatedDetailsOutputList);
         List<MerchantDetailsBO> merchantList = new ArrayList<>();
-        for (int merchant_idx = 0; merchant_idx < merchantsId.size(); merchant_idx++) {
-            MerchantDetailsBO merchantDetailsBO = MerchantDetailsBO.builder().asin(asin).pinCode(pinCode)
-                    .merchantId(merchantsId.get(merchant_idx))
-                    .merchantName(merchantsName.get(merchant_idx)).build();
-            merchantList.add(merchantDetailsBO);
-        }
+        for (int merchant_idx = 0; merchant_idx < merchantsId.size(); merchant_idx++)
+            merchantList.add(MerchantDetailsBO.builder().merchantId(merchantsId.get(merchant_idx))
+                    .merchantName(
+                            getMerchantAggregatedDetailsOutputList.get(merchant_idx).getMerchantAggregatedDetails()
+                                    .getMerchantName()).build());
         return merchantList;
     }
 
@@ -44,14 +40,5 @@ public class MerchantDetailsBuilder {
                     .encryptedMarketplaceId(marketplaceId).build());
         }
         return getMerchantAggregatedDetailsInputList;
-    }
-
-    private List<String> getMerchantNamesFromGetMerchantAggregatedDetailsOutput
-            (final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList) {
-        List<String> merchantsName = new ArrayList<>();
-        for (GetMerchantAggregatedDetailsOutput getMerchantAggregatedDetailsOutput :
-                getMerchantAggregatedDetailsOutputList)
-            merchantsName.add(getMerchantAggregatedDetailsOutput.getMerchantAggregatedDetails().getMerchantName());
-        return merchantsName;
     }
 }
