@@ -44,5 +44,4 @@ public class JobDetailsBuilderTest {
         assertEquals(expectedJobDetailsList, actualJobDetailsList);
         verify(elasticSearchAccessor).getRecords(any(SearchRequest.class));
     }
-
 }
