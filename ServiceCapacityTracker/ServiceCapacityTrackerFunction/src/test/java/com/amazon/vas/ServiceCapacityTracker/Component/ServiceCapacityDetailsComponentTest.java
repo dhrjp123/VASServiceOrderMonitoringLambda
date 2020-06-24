@@ -1,12 +1,15 @@
 package com.amazon.vas.ServiceCapacityTracker.Component;
 
-import com.amazon.vas.ServiceCapacityTracker.Builder.CapacityDataBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Builder.MerchantDetailsBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Builder.OfferDetailsBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Builder.ServiceCapacityDetailsBOBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Config.AppConfig;
 import com.amazon.vas.ServiceCapacityTracker.Constants.ConstantsClass;
 import com.amazon.vas.ServiceCapacityTracker.Model.*;
-import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.*;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.DefaultServiceCapacityDetailsBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.MerchantDetailsBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsBOBuilderInputBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsInputBOBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +32,7 @@ public class ServiceCapacityDetailsComponentTest {
     @Mock
     private OfferDetailsBuilder offerDetailsBuilder;
     @Mock
-    private CapacityDataBuilder capacityDataBuilder;
+    private ServiceCapacityDetailsBOBuilder serviceCapacityDetailsBOBuilder;
     @Mock
     private AppConfig appConfig;
 
@@ -43,17 +45,18 @@ public class ServiceCapacityDetailsComponentTest {
     public void testTrackCapacity_whenValidInputIsPassedWithEmptyStoreName_thenSuccessfulResponse() {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
                 new ServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build();
+        final ServiceCapacityDetailsBO expectedServiceCapacityDetailsBO =
+                new DefaultServiceCapacityDetailsBOBuilder().forAggregatedMerchants().build();
         Mockito.when(appConfig.getCityMapper()).thenReturn(getDefaultCityMap());
         Mockito.when(appConfig.getAsinMapper()).thenReturn(getDefaultAsinMap());
-        Mockito.when(capacityDataBuilder.getCapacityMap(getDefaultCapacityDataBuilderInputListForAggregatedMerchants(),
-                ConstantsClass.NUMBER_OF_COLUMNS)).thenReturn(getDefaultCapacityMapForAggregatedMerchants());
-        ServiceCapacityDetailsBO expectedServiceCapacityDetailsBO = new ServiceCapacityDetailsBOBuilder()
-                .forAggregatedMerchants().build();
+        Mockito.when(serviceCapacityDetailsBOBuilder.getResponse(
+                getDefaultServiceCapacityDetailsBOBuilderInputListForAggregatedMerchants(),
+                ConstantsClass.NUMBER_OF_COLUMNS)).thenReturn(expectedServiceCapacityDetailsBO);
         ServiceCapacityDetailsBO serviceCapacityDetailsBO = serviceCapacityDetailsComponent
                 .trackCapacity(serviceCapacityDetailsInputBO);
         assertEquals(expectedServiceCapacityDetailsBO, serviceCapacityDetailsBO);
-        Mockito.verify(capacityDataBuilder)
-                .getCapacityMap(getDefaultCapacityDataBuilderInputListForAggregatedMerchants(),
+        Mockito.verify(serviceCapacityDetailsBOBuilder)
+                .getResponse(getDefaultServiceCapacityDetailsBOBuilderInputListForAggregatedMerchants(),
                         ConstantsClass.NUMBER_OF_COLUMNS);
     }
 
@@ -62,24 +65,27 @@ public class ServiceCapacityDetailsComponentTest {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
                 new ServiceCapacityDetailsInputBOBuilder().withStoreName().build();
         final ServiceCapacityDetailsBO expectedServiceCapacityDetailsBO =
-                new ServiceCapacityDetailsBOBuilder().forIndividualMerchants().build();
+                new DefaultServiceCapacityDetailsBOBuilder().forIndividualMerchants().build();
         Mockito.when(appConfig.getAsinMapper()).thenReturn(getDefaultAsinMap());
         Mockito.when(appConfig.getCityMapper()).thenReturn(getDefaultCityMap());
-        Mockito.when(capacityDataBuilder.getCapacityMap(getDefaultCapacityDataBuilderInputListForIndividualMerchants(),
-                ConstantsClass.NUMBER_OF_COLUMNS)).thenReturn(getDefaultCapacityMapForIndividualMerchants());
-        Mockito.when(offerDetailsBuilder.getOfferDetailsList(ConstantsClass.ASIN, ConstantsClass.PINCODE,
-                ConstantsClass.MARKETPLACE_ID)).thenReturn(getDefaultOfferDetailsList());
+        Mockito.when(serviceCapacityDetailsBOBuilder.getResponse(
+                getDefaultServiceCapacityDetailsBOBuilderInputListForIndividualMerchants(),
+                ConstantsClass.NUMBER_OF_COLUMNS)).thenReturn(expectedServiceCapacityDetailsBO);
+        Mockito.when(offerDetailsBuilder
+                .getOfferDetailsList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE
+                )).thenReturn(getDefaultOfferDetailsList());
         Mockito.when(merchantDetailsBuilder.getMerchants(ConstantsClass.MARKETPLACE_ID,
                 getDefaultUnderlyingMerchantsIDList()))
                 .thenReturn(getDefaultMerchantListForIndividualMerchants());
         final ServiceCapacityDetailsBO serviceCapacityDetailsBO = serviceCapacityDetailsComponent
                 .trackCapacity(serviceCapacityDetailsInputBO);
         assertEquals(expectedServiceCapacityDetailsBO, serviceCapacityDetailsBO);
-        Mockito.verify(capacityDataBuilder)
-                .getCapacityMap(getDefaultCapacityDataBuilderInputListForIndividualMerchants(),
+        Mockito.verify(serviceCapacityDetailsBOBuilder)
+                .getResponse(getDefaultServiceCapacityDetailsBOBuilderInputListForIndividualMerchants(),
                         ConstantsClass.NUMBER_OF_COLUMNS);
-        Mockito.verify(offerDetailsBuilder).getOfferDetailsList(ConstantsClass.ASIN, ConstantsClass.PINCODE,
-                ConstantsClass.MARKETPLACE_ID);
+        Mockito.verify(offerDetailsBuilder)
+                .getOfferDetailsList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE
+                );
         Mockito.verify(merchantDetailsBuilder).getMerchants(ConstantsClass.MARKETPLACE_ID,
                 getDefaultUnderlyingMerchantsIDList());
     }
@@ -95,26 +101,6 @@ public class ServiceCapacityDetailsComponentTest {
         cityMap.put(ConstantsClass.AGGREGATED_MERCHANT_NAME, CityDetailsBO.builder().pinCode(ConstantsClass.PINCODE)
                 .merchantId(ConstantsClass.AGGREGATED_MERCHANT_ID).build());
         return cityMap;
-    }
-
-    private Map<CapacityDataItemUniqueKeys, StoreCapacityBO> getDefaultCapacityMapForAggregatedMerchants() {
-        Map<CapacityDataItemUniqueKeys, StoreCapacityBO> capacityMap = new HashMap<>();
-        LocalDate today = LocalDate.now();
-        for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
-            capacityMap.put(new MerchantUniqueKeysBOBuilder()
-                            .forAggregatedMerchants(today.plusDays(date_idx).toString()).build(),
-                    new StoreCapacityBOBuilder().build());
-        return capacityMap;
-    }
-
-    private Map<CapacityDataItemUniqueKeys, StoreCapacityBO> getDefaultCapacityMapForIndividualMerchants() {
-        Map<CapacityDataItemUniqueKeys, StoreCapacityBO> capacityMap = new HashMap<>();
-        LocalDate today = LocalDate.now();
-        for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
-            capacityMap.put(new MerchantUniqueKeysBOBuilder()
-                            .forIndividualMerchants(today.plusDays(date_idx).toString()).build(),
-                    new StoreCapacityBOBuilder().build());
-        return capacityMap;
     }
 
     private List<MerchantDetailsBO> getDefaultMerchantListForIndividualMerchants() {
@@ -138,15 +124,17 @@ public class ServiceCapacityDetailsComponentTest {
         return underlyingMerchantsList;
     }
 
-    private List<CapacityDataBuilderInput> getDefaultCapacityDataBuilderInputListForAggregatedMerchants() {
-        List<CapacityDataBuilderInput> capacityDataBuilderInputList = new ArrayList<>();
-        capacityDataBuilderInputList.add(new CapacityDataBuilderInputBuilder().forAggregatedMerchants().build());
-        return capacityDataBuilderInputList;
+    private List<ServiceCapacityDetailsBOBuilderInput> getDefaultServiceCapacityDetailsBOBuilderInputListForAggregatedMerchants() {
+        List<ServiceCapacityDetailsBOBuilderInput> serviceCapacityDetailsBOBuilderInputList = new ArrayList<>();
+        serviceCapacityDetailsBOBuilderInputList
+                .add(new ServiceCapacityDetailsBOBuilderInputBuilder().forAggregatedMerchants().build());
+        return serviceCapacityDetailsBOBuilderInputList;
     }
 
-    private List<CapacityDataBuilderInput> getDefaultCapacityDataBuilderInputListForIndividualMerchants() {
-        List<CapacityDataBuilderInput> capacityDataBuilderInputList = new ArrayList<>();
-        capacityDataBuilderInputList.add(new CapacityDataBuilderInputBuilder().forIndividualMerchants().build());
-        return capacityDataBuilderInputList;
+    private List<ServiceCapacityDetailsBOBuilderInput> getDefaultServiceCapacityDetailsBOBuilderInputListForIndividualMerchants() {
+        List<ServiceCapacityDetailsBOBuilderInput> serviceCapacityDetailsBOBuilderInputList = new ArrayList<>();
+        serviceCapacityDetailsBOBuilderInputList
+                .add(new ServiceCapacityDetailsBOBuilderInputBuilder().forIndividualMerchants().build());
+        return serviceCapacityDetailsBOBuilderInputList;
     }
 }

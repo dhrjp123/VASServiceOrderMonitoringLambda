@@ -32,8 +32,9 @@ public class OfferDetailsBuilderTest {
         final List<VasOffer> vasOfferList = getDefaultVasOfferList();
         final List<OfferDetails> expectedOfferDetailsList = getDefaultOfferDetailsList();
         Mockito.when(vosServiceAccessor.getVasOffers(getBuyableOffersInput)).thenReturn(vasOfferList);
-        final List<OfferDetails> offerDetailsList = offerDetailsBuilder.getOfferDetailsList(ConstantsClass.ASIN,
-                ConstantsClass.PINCODE, ConstantsClass.MARKETPLACE_ID);
+        final List<OfferDetails> offerDetailsList = offerDetailsBuilder.getOfferDetailsList(
+                ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN,
+                ConstantsClass.PINCODE);
         assertEquals(expectedOfferDetailsList, offerDetailsList);
         Mockito.verify(vosServiceAccessor).getVasOffers(getBuyableOffersInput);
     }

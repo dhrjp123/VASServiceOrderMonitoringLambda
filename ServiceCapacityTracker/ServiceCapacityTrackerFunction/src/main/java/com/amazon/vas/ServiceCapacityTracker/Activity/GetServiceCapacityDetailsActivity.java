@@ -21,8 +21,7 @@ public class GetServiceCapacityDetailsActivity {
             @NonNull final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput) {
         validateInput(getServiceCapacityDetailsInput);
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
-                translateToServiceCapacityDetailsInputBO(
-                        getServiceCapacityDetailsInput);
+                translateToServiceCapacityDetailsInputBO(getServiceCapacityDetailsInput);
         final ServiceCapacityDetailsBO serviceCapacityDetailsBO =
                 serviceCapacityDetailsComponent.trackCapacity(serviceCapacityDetailsInputBO);
         return translateToGetServiceCapacityDetailsOutput(

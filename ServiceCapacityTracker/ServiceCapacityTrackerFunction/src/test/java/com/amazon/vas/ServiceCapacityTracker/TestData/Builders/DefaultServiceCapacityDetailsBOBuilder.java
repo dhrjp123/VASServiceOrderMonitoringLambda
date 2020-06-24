@@ -9,14 +9,14 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceCapacityDetailsBOBuilder {
+public class DefaultServiceCapacityDetailsBOBuilder {
     private ServiceCapacityDetailsBO serviceCapacityDetailsBO;
 
     public ServiceCapacityDetailsBO build() {
         return serviceCapacityDetailsBO;
     }
 
-    public ServiceCapacityDetailsBOBuilder forAggregatedMerchants() {
+    public DefaultServiceCapacityDetailsBOBuilder forAggregatedMerchants() {
         List<StoreCapacityBO> capacityList = new ArrayList<>();
         for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
             capacityList.add(new StoreCapacityBOBuilder().build());
@@ -27,7 +27,7 @@ public class ServiceCapacityDetailsBOBuilder {
         return this;
     }
 
-    public ServiceCapacityDetailsBOBuilder forIndividualMerchants() {
+    public DefaultServiceCapacityDetailsBOBuilder forIndividualMerchants() {
         List<StoreCapacityBO> capacityList = new ArrayList<>();
         for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
             capacityList.add(new StoreCapacityBOBuilder().build());

@@ -4,9 +4,9 @@ import com.amazon.vas.ServiceCapacityTracker.Accessor.DynamoDbAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Accessor.SPINServiceAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Accessor.VOSServiceAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Activity.GetServiceCapacityDetailsActivity;
-import com.amazon.vas.ServiceCapacityTracker.Builder.CapacityDataBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Builder.MerchantDetailsBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Builder.OfferDetailsBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Builder.ServiceCapacityDetailsBOBuilder;
 import com.amazon.vas.ServiceCapacityTracker.Component.ServiceCapacityDetailsComponent;
 import com.amazon.vas.ServiceCapacityTracker.Config.AppConfig;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
@@ -38,8 +38,9 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
     @Provides
     public ServiceCapacityDetailsComponent buildServiceCapacityTrackerComponent(
             @NonNull MerchantDetailsBuilder merchantDetailsBuilder, @NonNull OfferDetailsBuilder offerDetailsBuilder,
-            @NonNull CapacityDataBuilder capacityDataBuilder, @NonNull AppConfig appConfig) {
-        return new ServiceCapacityDetailsComponent(merchantDetailsBuilder, offerDetailsBuilder, capacityDataBuilder,
+            @NonNull ServiceCapacityDetailsBOBuilder serviceCapacityDetailsBOBuilder, @NonNull AppConfig appConfig) {
+        return new ServiceCapacityDetailsComponent(merchantDetailsBuilder, offerDetailsBuilder,
+                serviceCapacityDetailsBOBuilder,
                 appConfig);
     }
 
@@ -57,8 +58,8 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
 
     @Singleton
     @Provides
-    public CapacityDataBuilder buildCapacityDataBuilder(@NonNull DynamoDbAccessor dynamoDbAccessor) {
-        return new CapacityDataBuilder(dynamoDbAccessor);
+    public ServiceCapacityDetailsBOBuilder buildServiceCapacityDetailsBOBuilder(@NonNull DynamoDbAccessor dynamoDbAccessor) {
+        return new ServiceCapacityDetailsBOBuilder(dynamoDbAccessor);
     }
 
     @Singleton

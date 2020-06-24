@@ -7,7 +7,7 @@ import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsInpu
 import com.amazon.vas.ServiceCapacityTracker.Model.GetServiceCapacityDetailsOutput;
 import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityBO;
 import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityDetailsBO;
-import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.DefaultServiceCapacityDetailsBOBuilder;
 import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsInputBOBuilder;
 import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.StoreCapacityBOBuilder;
 import com.google.common.collect.ImmutableList;
@@ -43,7 +43,7 @@ public class GetServiceCapacityDetailsActivityTest {
                 getDefaultGetServiceCapacityDetailsOutput();
         when(serviceCapacityDetailsComponent
                 .trackCapacity(new ServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build()))
-                .thenReturn(new ServiceCapacityDetailsBOBuilder().forAggregatedMerchants().build());
+                .thenReturn(new DefaultServiceCapacityDetailsBOBuilder().forAggregatedMerchants().build());
         final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput = getServiceCapacityDetailsActivity.
                 handleRequest(getServiceCapacityDetailsInput);
         assertEquals(expectedGetServiceCapacityDetailsOutput, getServiceCapacityDetailsOutput);

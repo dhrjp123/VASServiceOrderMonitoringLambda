@@ -2,13 +2,11 @@ package com.amazon.vas.ServiceCapacityTracker.Builder;
 
 import com.amazon.vas.ServiceCapacityTracker.Accessor.DynamoDbAccessor;
 import com.amazon.vas.ServiceCapacityTracker.Constants.ConstantsClass;
-import com.amazon.vas.ServiceCapacityTracker.Model.CapacityDataBuilderInput;
-import com.amazon.vas.ServiceCapacityTracker.Model.CapacityDataItemUniqueKeys;
-import com.amazon.vas.ServiceCapacityTracker.Model.StoreCapacityBO;
-import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.CapacityDataBuilderInputBuilder;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBO;
+import com.amazon.vas.ServiceCapacityTracker.Model.ServiceCapacityDetailsBOBuilderInput;
 import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.CapacityDataItemBuilder;
-import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.MerchantUniqueKeysBOBuilder;
-import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.StoreCapacityBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.DefaultServiceCapacityDetailsBOBuilder;
+import com.amazon.vas.ServiceCapacityTracker.TestData.Builders.ServiceCapacityDetailsBOBuilderInputBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -24,9 +22,9 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class CapacityDataBuilderTest {
+public class ServiceCapacityDetailsBOBuilderTest {
     @InjectMocks
-    private CapacityDataBuilder capacityDataBuilder;
+    private ServiceCapacityDetailsBOBuilder serviceCapacityDetailsBOBuilder;
     @Mock
     private DynamoDbAccessor dynamoDbAccessor;
 
@@ -37,29 +35,22 @@ public class CapacityDataBuilderTest {
 
     @Test
     public void testGetCapacityMap_whenValidInputIsPassed_thenSuccessfulResponse() {
-        final List<CapacityDataBuilderInput> capacityDataBuilderInputList = getDefaultCapacityDataBuilderInputList();
-        final Map<CapacityDataItemUniqueKeys, StoreCapacityBO> expectedCapacityMap = getDefaultCapacityMap();
+        final List<ServiceCapacityDetailsBOBuilderInput> serviceCapacityDetailsBOBuilderInputList =
+                getDefaultServiceCapacityDetailsBOBuilderInputList();
+        final ServiceCapacityDetailsBO expectedServiceCapacityDetailsBO = new DefaultServiceCapacityDetailsBOBuilder()
+                .forAggregatedMerchants().build();
         Mockito.when(dynamoDbAccessor.getItems(getDefaultItemsToGetList())).thenReturn(getDefaultCapacityItemMap());
-        final Map<CapacityDataItemUniqueKeys, StoreCapacityBO> capacityMap = capacityDataBuilder.getCapacityMap(
-                capacityDataBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS);
-        assertEquals(expectedCapacityMap, capacityMap);
+        final ServiceCapacityDetailsBO serviceCapacityDetailsBO = serviceCapacityDetailsBOBuilder.getResponse(
+                serviceCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS);
+        assertEquals(expectedServiceCapacityDetailsBO, serviceCapacityDetailsBO);
         Mockito.verify(dynamoDbAccessor).getItems(getDefaultItemsToGetList());
     }
 
-    private Map<CapacityDataItemUniqueKeys, StoreCapacityBO> getDefaultCapacityMap() {
-        Map<CapacityDataItemUniqueKeys, StoreCapacityBO> capacityMap = new HashMap<>();
-        LocalDate today = LocalDate.now();
-        for (int date_idx = 0; date_idx < ConstantsClass.NUMBER_OF_COLUMNS; date_idx++)
-            capacityMap.put(new MerchantUniqueKeysBOBuilder()
-                            .forAggregatedMerchants(today.plusDays(date_idx).toString()).build(),
-                    new StoreCapacityBOBuilder().build());
-        return capacityMap;
-    }
-
-    private List<CapacityDataBuilderInput> getDefaultCapacityDataBuilderInputList() {
-        List<CapacityDataBuilderInput> capacityDataBuilderInputList = new ArrayList<>();
-        capacityDataBuilderInputList.add(new CapacityDataBuilderInputBuilder().forAggregatedMerchants().build());
-        return capacityDataBuilderInputList;
+    private List<ServiceCapacityDetailsBOBuilderInput> getDefaultServiceCapacityDetailsBOBuilderInputList() {
+        List<ServiceCapacityDetailsBOBuilderInput> serviceCapacityDetailsBOBuilderInputList = new ArrayList<>();
+        serviceCapacityDetailsBOBuilderInputList
+                .add(new ServiceCapacityDetailsBOBuilderInputBuilder().forAggregatedMerchants().build());
+        return serviceCapacityDetailsBOBuilderInputList;
     }
 
     private List<Object> getDefaultItemsToGetList() {

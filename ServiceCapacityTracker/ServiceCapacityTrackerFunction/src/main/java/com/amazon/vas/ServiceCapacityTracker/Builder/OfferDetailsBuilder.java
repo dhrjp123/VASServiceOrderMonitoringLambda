@@ -14,8 +14,8 @@ public class OfferDetailsBuilder {
     @NonNull
     private final VOSServiceAccessor vosServiceAccessor;
 
-    public List<OfferDetails> getOfferDetailsList(@NonNull final String asin, @NonNull final String pinCode,
-                                                  @NonNull final String marketplaceId) {
+    public List<OfferDetails> getOfferDetailsList(@NonNull final String marketplaceId, @NonNull final String asin,
+                                                  @NonNull final String pinCode) {
         final AddressInput addressInput = AddressInput.builder().postalCode(pinCode).build();
         final OfferSelector offerSelector = OfferSelector.builder().addressInput(addressInput).build();
         final GetBuyableOffersInput getBuyableOffersInput = GetBuyableOffersInput.builder()

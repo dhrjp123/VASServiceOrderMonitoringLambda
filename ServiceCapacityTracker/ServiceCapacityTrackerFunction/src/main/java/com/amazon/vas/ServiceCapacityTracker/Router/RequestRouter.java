@@ -20,20 +20,20 @@ public class RequestRouter implements RequestHandler<Map<String, String>, Object
     public String handleRequest(@NonNull final Map<String, String> input, @NonNull final Context context) {
         getServiceCapacityDetailsActivity = getGetServiceCapacityDetailsActivityInstance();
         final GetServiceCapacityDetailsInput getServiceCapacityDetailsInput
-                = translateInputToGetServiceCapacityDetailsInput(input);
+                = translateToGetServiceCapacityDetailsInput(input);
         final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput
                 = getServiceCapacityDetailsActivity.handleRequest(getServiceCapacityDetailsInput);
-        return translateGetServiceCapacityDetailsOutputToJson(getServiceCapacityDetailsOutput);
+        return translateToJson(getServiceCapacityDetailsOutput);
     }
 
-    private GetServiceCapacityDetailsInput translateInputToGetServiceCapacityDetailsInput(
+    private GetServiceCapacityDetailsInput translateToGetServiceCapacityDetailsInput(
             final Map<String, String> input) {
         return GetServiceCapacityDetailsInput.builder().skillType(input.get("skillType")).
                 marketplaceId(input.get("marketplaceId")).storeName(input.get("storeName"))
                 .numberOfDays(Integer.parseInt(input.get("numberOfDays"))).build();
     }
 
-    private String translateGetServiceCapacityDetailsOutputToJson(
+    private String translateToJson(
             final GetServiceCapacityDetailsOutput getServiceCapacityDetailsOutput) {
         return GSON.toJson(getServiceCapacityDetailsOutput, GetServiceCapacityDetailsOutput.class);
     }

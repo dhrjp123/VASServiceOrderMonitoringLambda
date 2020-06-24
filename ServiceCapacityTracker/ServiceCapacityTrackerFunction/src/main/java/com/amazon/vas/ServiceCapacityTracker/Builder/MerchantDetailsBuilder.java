@@ -21,7 +21,7 @@ public class MerchantDetailsBuilder {
         final List<GetMerchantAggregatedDetailsOutput> getMerchantAggregatedDetailsOutputList =
                 spinServiceAccessor
                         .getGetMerchantAggregatedDetailsOutput(translateToGetMerchantAggregatedDetailsInputList(
-                                merchantsId, marketplaceId));
+                                marketplaceId, merchantsId));
         List<MerchantDetailsBO> merchantList = new ArrayList<>();
         for (int merchant_idx = 0; merchant_idx < merchantsId.size(); merchant_idx++)
             merchantList.add(MerchantDetailsBO.builder().merchantId(merchantsId.get(merchant_idx))
@@ -32,7 +32,7 @@ public class MerchantDetailsBuilder {
     }
 
     private List<GetMerchantAggregatedDetailsInput> translateToGetMerchantAggregatedDetailsInputList(
-            final List<String> merchantsId, final String marketplaceId) {
+            final String marketplaceId, final List<String> merchantsId) {
         List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList = new ArrayList<>();
         for (String merchantId : merchantsId) {
             getMerchantAggregatedDetailsInputList.add(GetMerchantAggregatedDetailsInput.builder()
