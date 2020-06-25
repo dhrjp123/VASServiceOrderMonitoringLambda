@@ -9,16 +9,17 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import util.TestDataBuilder;
+import util.DefaultModelBuilders;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static util.TestConstants.CITY;
 
 
 public class GetJobMetricsActivityTest {
 
-    private TestDataBuilder testDataBuilder;
+    private DefaultModelBuilders defaultModelBuilders;
 
     @Mock
     private GetJobMetricsComponent getJobMetricsComponent;
@@ -33,16 +34,15 @@ public class GetJobMetricsActivityTest {
 
     @Test
     public void getJobMetricsActivityTest() {
-        testDataBuilder = new TestDataBuilder();
-        final GetJobMetricsOutputBO getJobMetricsOutputBO = testDataBuilder.buildGetJobMetricsOutputBO_withCityAndSlotStartTime();
-        System.out.println(getJobMetricsOutputBO);
-        when(getJobMetricsComponent.getJobMetrics(testDataBuilder.buildGetJobMetricsInputBO_withCityAndSlotStartTime()))
+        defaultModelBuilders = new DefaultModelBuilders();
+        final GetJobMetricsOutputBO getJobMetricsOutputBO = defaultModelBuilders.buildGetJobMetricsOutputBO(CITY);
+        when(getJobMetricsComponent.getJobMetrics(defaultModelBuilders.buildGetJobMetricsInputBO(CITY)))
                 .thenReturn(getJobMetricsOutputBO);
         final GetJobMetricsOutput actualGetJobMetricsOutput = getJobMetricsActivity.enact(
-                testDataBuilder.buildGetJobMetricsInput_withCityAndSlotStartTime());
-        final GetJobMetricsOutput expectedGetJobMetricsOutput = testDataBuilder.buildGetJobMetricsOutput_withCityAndSlotStartTime(getJobMetricsOutputBO);
+                defaultModelBuilders.buildGetJobMetricsInput(CITY));
+        final GetJobMetricsOutput expectedGetJobMetricsOutput = defaultModelBuilders.buildGetJobMetricsOutput(getJobMetricsOutputBO);
         assertEquals(expectedGetJobMetricsOutput, actualGetJobMetricsOutput);
-        verify(getJobMetricsComponent).getJobMetrics(testDataBuilder.buildGetJobMetricsInputBO_withCityAndSlotStartTime());
+        verify(getJobMetricsComponent).getJobMetrics(defaultModelBuilders.buildGetJobMetricsInputBO(CITY));
     }
 
 }
