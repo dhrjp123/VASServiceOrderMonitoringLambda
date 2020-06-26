@@ -14,12 +14,10 @@ import util.DefaultModelBuilders;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static util.TestConstants.CITY;
+import static util.JobAggregatedMetricsConstants.CITY;
 
 
 public class GetJobMetricsActivityTest {
-
-    private DefaultModelBuilders defaultModelBuilders;
 
     @Mock
     private GetJobMetricsComponent getJobMetricsComponent;
@@ -34,7 +32,6 @@ public class GetJobMetricsActivityTest {
 
     @Test
     public void getJobMetricsActivityTest() {
-        defaultModelBuilders = new DefaultModelBuilders();
         final GetJobMetricsOutputBO getJobMetricsOutputBO = defaultModelBuilders.buildGetJobMetricsOutputBO(CITY);
         when(getJobMetricsComponent.getJobMetrics(defaultModelBuilders.buildGetJobMetricsInputBO(CITY)))
                 .thenReturn(getJobMetricsOutputBO);
@@ -44,5 +41,7 @@ public class GetJobMetricsActivityTest {
         assertEquals(expectedGetJobMetricsOutput, actualGetJobMetricsOutput);
         verify(getJobMetricsComponent).getJobMetrics(defaultModelBuilders.buildGetJobMetricsInputBO(CITY));
     }
+
+    private final DefaultModelBuilders defaultModelBuilders = new DefaultModelBuilders();
 
 }

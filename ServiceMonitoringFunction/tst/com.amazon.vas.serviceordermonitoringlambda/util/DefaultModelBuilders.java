@@ -10,8 +10,9 @@ import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static util.TestConstants.*;
+import static util.JobAggregatedMetricsConstants.*;
 
 public class DefaultModelBuilders {
 
@@ -19,26 +20,24 @@ public class DefaultModelBuilders {
     private final long baseTime = 1592800200;
     private final long timeBias = 3600;
 
-    public GetJobMetricsInputBO buildGetJobMetricsInputBO(String filteringKey){
+    public GetJobMetricsInputBO buildGetJobMetricsInputBO(String groupingKey){
         GetJobMetricsInputBO getJobMetricsInputBO = GetJobMetricsInputBO.builder().city(null)
                 .merchantId(null).serviceCategory(null)
-                .groupingCriteria(new ArrayList<>(Arrays.asList(filteringKey, SLOT_START_TIME))).build();
+                .groupingCriteria(new ArrayList<>(Arrays.asList(groupingKey, SLOT_START_TIME))).build();
         return getJobMetricsInputBO;
     }
-    public GetJobMetricsInput buildGetJobMetricsInput(String filteringKey){
+    public GetJobMetricsInput buildGetJobMetricsInput(String groupingKey){
         GetJobMetricsInput getJobMetricsInput = GetJobMetricsInput.builder().city(null)
                 .merchantId(null).serviceCategory(null)
-                .groupingCriteria(new ArrayList<>(Arrays.asList(filteringKey, SLOT_START_TIME))).build();
+                .groupingCriteria(new ArrayList<>(Arrays.asList(groupingKey, SLOT_START_TIME))).build();
         return getJobMetricsInput;
     }
 
-    public ArrayList<JobDetailsBO> buildJobDetailsList() {
+    public List<JobDetailsBO> buildJobDetailsList(JobAggregatedMetricsInputFilters filters) {
         final Gson gson = new Gson();
-        final List<String> jobDetailsJson = buildJobDetailsJson();
-        final ArrayList<JobDetailsBO> expectedJobDetailsList = new ArrayList<>();
-        for (String job : jobDetailsJson) {
-            expectedJobDetailsList.add(gson.fromJson(job, JobDetailsBO.class));
-        }
+        final List<String> jobDetailsJson = buildJobDetailsJson(filters);
+        final List<JobDetailsBO> expectedJobDetailsList = jobDetailsJson.stream()
+                .map(job -> gson.fromJson(job, JobDetailsBO.class)).collect(Collectors.toList());
         return expectedJobDetailsList;
     }
 
@@ -48,15 +47,15 @@ public class DefaultModelBuilders {
     }
 
 
-    public GetJobMetricsOutputBO buildGetJobMetricsOutputBO(String filteringKey) {
+    public GetJobMetricsOutputBO buildGetJobMetricsOutputBO(String groupingKey) {
 
         final Map<String, Map<String, String>> metaData = new HashMap<>();
         final Map<List<String>, JobAggregatedMetricsBO> jobMetricsMap = new HashMap<>();
         for(int i = 0; i< numberOfTestJobs; i++){
-            String filteringKeyValue = filteringKey+i;
-            metaData.put(filteringKeyValue, new HashMap<String, String>() {{
-                put("name", filteringKeyValue);
-                put("ID", filteringKeyValue);
+            String groupingKeyValue = groupingKey+i;
+            metaData.put(groupingKeyValue, new HashMap<String, String>() {{
+                put("name", groupingKeyValue);
+                put("ID", groupingKeyValue);
             }});
         }
 
@@ -66,28 +65,30 @@ public class DefaultModelBuilders {
                     .statusNotUpdatedCount(1)
                     .otaFailureCount(1)
                     .etaDelayCount(1).build();
-            final List<String> groupingCriteriaValues = new ArrayList<>(Arrays.asList(filteringKey+i,Long.toString(baseTime + timeBias * i)));
+            final List<String> groupingCriteriaValues = new ArrayList<>(Arrays.asList(groupingKey+i,Long.toString(baseTime + timeBias * i)));
             jobMetricsMap.put(groupingCriteriaValues, jobAggregatedMetricsBO);
         }
 
         return GetJobMetricsOutputBO.builder().metaData(metaData).jobMetricsMap(jobMetricsMap).build();
     }
 
-    public List<String> buildJobDetailsJson() {
+    public List<String> buildJobDetailsJson(JobAggregatedMetricsInputFilters filters) {
         final List<String> jobDetailsJson = new ArrayList<>();
         final JSONObject json = new JSONObject();
         for(int i = 0; i< numberOfTestJobs; i++){
+            final String city = filters.getCity() == null? CITY+i:filters.getCity() ;
+            final String merchantId = filters.getMerchantId()  == null? MERCHANT_ID+i:filters.getMerchantId() ;
+            final String technicianId = filters.getTechnicianId()  == null? TECHNICIAN_ID+i:filters.getTechnicianId();
+            json.put("jdes", NOT_SERVICED);
+            json.put("jbd", Long.toString(baseTime + timeBias * i));
+            json.put("cty", city);
+            json.put("mid", merchantId);
+            json.put("tid", technicianId);
+            json.put("lse", true);
+            json.put("isj", true);
 
-                json.put("jdes", NOT_SERVICED);
-                json.put("jbd", Long.toString(baseTime + timeBias * i));
-                json.put("cty", CITY+i);
-                json.put("mid", MERCHANT_ID+i);
-                json.put("tid", TECHNICIAN_ID+i);
-                json.put("lse", true);
-                json.put("isj", true);
-
-                jobDetailsJson.add(json.toJSONString());
-                json.clear();
+            jobDetailsJson.add(json.toJSONString());
+            json.clear();
         }
         return jobDetailsJson;
     }

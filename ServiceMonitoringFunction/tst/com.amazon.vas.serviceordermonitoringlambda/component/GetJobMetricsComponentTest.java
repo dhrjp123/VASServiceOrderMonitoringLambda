@@ -10,16 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import util.DefaultModelBuilders;
+import util.JobAggregatedMetricsInputFilters;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static util.TestConstants.CITY;
-import static util.TestConstants.MERCHANT_ID;
+import static util.JobAggregatedMetricsConstants.*;
 
 public class GetJobMetricsComponentTest {
-
-    private DefaultModelBuilders defaultModelBuilders;
 
     @Mock
     private JobDetailsBuilder jobDetailsBuilder;
@@ -33,11 +31,12 @@ public class GetJobMetricsComponentTest {
     }
 
     @Test
-    public void testGetJobMetricsComponent_withCityAndSlotStartTime() {
-        defaultModelBuilders = new DefaultModelBuilders();
+    public void testGetJobMetricsComponent_withCityAndSlotStartTime_withNoFilter() {
         final GetJobMetricsInputBO getJobMetricsInputBO = defaultModelBuilders.buildGetJobMetricsInputBO(CITY);
+        final JobAggregatedMetricsInputFilters filters = new JobAggregatedMetricsInputFilters();
+
         when(jobDetailsBuilder.getJobDetailsBuilder(getJobMetricsInputBO))
-                .thenReturn(defaultModelBuilders.buildJobDetailsList());
+                .thenReturn(defaultModelBuilders.buildJobDetailsList(filters));
         final GetJobMetricsOutputBO expectedGetJobMetricsOutput = defaultModelBuilders.buildGetJobMetricsOutputBO(CITY);
         final GetJobMetricsOutputBO actualGetJobMetricsOutput = getJobMetricsComponent
                 .getJobMetrics(getJobMetricsInputBO);
@@ -47,10 +46,11 @@ public class GetJobMetricsComponentTest {
     }
 
     @Test
-    public void testGetJobMetricsComponent_withMerchantIdAndSlotStartTime() {
-        defaultModelBuilders = new DefaultModelBuilders();
+    public void testGetJobMetricsComponent_withMerchantIdAndSlotStartTime_withCityFilter() {
         final GetJobMetricsInputBO getJobMetricsInputBO = defaultModelBuilders.buildGetJobMetricsInputBO(MERCHANT_ID);
-        when(jobDetailsBuilder.getJobDetailsBuilder(getJobMetricsInputBO)).thenReturn(defaultModelBuilders.buildJobDetailsList());
+        final JobAggregatedMetricsInputFilters filters = new JobAggregatedMetricsInputFilters();
+        filters.setCity(TEST_CITY);
+        when(jobDetailsBuilder.getJobDetailsBuilder(getJobMetricsInputBO)).thenReturn(defaultModelBuilders.buildJobDetailsList(filters));
         final GetJobMetricsOutputBO expectedGetJobMetricsOutput = defaultModelBuilders.buildGetJobMetricsOutputBO(MERCHANT_ID);
         final GetJobMetricsOutputBO actualGetJobMetricsOutput = getJobMetricsComponent
                 .getJobMetrics(getJobMetricsInputBO);
@@ -58,4 +58,18 @@ public class GetJobMetricsComponentTest {
         verify(jobDetailsBuilder).getJobDetailsBuilder(getJobMetricsInputBO);
     }
 
+    @Test
+    public void testGetJobMetricsComponent_withTechnicianIdAndSlotStartTime_withCityAndMerchantFilter() {
+        final GetJobMetricsInputBO getJobMetricsInputBO = defaultModelBuilders.buildGetJobMetricsInputBO(TECHNICIAN_ID);
+        final JobAggregatedMetricsInputFilters filters = new JobAggregatedMetricsInputFilters();
+        filters.setCity(TEST_CITY);
+        filters.setMerchantId(TEST_MERCHANT_ID);
+        when(jobDetailsBuilder.getJobDetailsBuilder(getJobMetricsInputBO)).thenReturn(defaultModelBuilders.buildJobDetailsList(filters));
+        final GetJobMetricsOutputBO expectedGetJobMetricsOutput = defaultModelBuilders.buildGetJobMetricsOutputBO(TECHNICIAN_ID);
+        final GetJobMetricsOutputBO actualGetJobMetricsOutput = getJobMetricsComponent
+                .getJobMetrics(getJobMetricsInputBO);
+        assertEquals(expectedGetJobMetricsOutput, actualGetJobMetricsOutput);
+        verify(jobDetailsBuilder).getJobDetailsBuilder(getJobMetricsInputBO);
+    }
+    private final DefaultModelBuilders defaultModelBuilders = new DefaultModelBuilders();
 }

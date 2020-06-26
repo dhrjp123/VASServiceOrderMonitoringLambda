@@ -10,18 +10,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import util.DefaultModelBuilders;
+import util.JobAggregatedMetricsInputFilters;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static util.TestConstants.CITY;
+import static util.JobAggregatedMetricsConstants.CITY;
 
 public class JobDetailsBuilderTest {
-
-    private DefaultModelBuilders defaultModelBuilders;
 
     @Mock
     private ElasticSearchAccessor elasticSearchAccessor;
@@ -36,14 +35,14 @@ public class JobDetailsBuilderTest {
 
     @Test
     public void jobDetailsBuilderTest() {
-        defaultModelBuilders = new DefaultModelBuilders();
-
-        when(elasticSearchAccessor.getRecords(any(SearchRequest.class))).thenReturn(defaultModelBuilders.buildJobDetailsJson());
-        final ArrayList<JobDetailsBO> actualJobDetailsList = jobDetailsBuilder
+        final JobAggregatedMetricsInputFilters filters = new JobAggregatedMetricsInputFilters();
+        when(elasticSearchAccessor.getRecords(any(SearchRequest.class))).thenReturn(defaultModelBuilders.buildJobDetailsJson(filters));
+        final List<JobDetailsBO> actualJobDetailsList = jobDetailsBuilder
                 .getJobDetailsBuilder(defaultModelBuilders.buildGetJobMetricsInputBO(CITY));
-        final ArrayList<JobDetailsBO> expectedJobDetailsList = defaultModelBuilders.buildJobDetailsList();
+        final List<JobDetailsBO> expectedJobDetailsList = defaultModelBuilders.buildJobDetailsList(filters);
         assertEquals(expectedJobDetailsList, actualJobDetailsList);
         verify(elasticSearchAccessor).getRecords(any(SearchRequest.class));
     }
 
+    private final DefaultModelBuilders defaultModelBuilders = new DefaultModelBuilders();
 }
