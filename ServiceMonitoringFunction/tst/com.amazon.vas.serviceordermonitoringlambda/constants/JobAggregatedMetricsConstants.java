@@ -1,4 +1,4 @@
-package util;
+package constants;
 
 public class JobAggregatedMetricsConstants {
     public static String NOT_SERVICED = "NotServiced";

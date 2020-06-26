@@ -15,7 +15,7 @@ import util.JobAggregatedMetricsInputFilters;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static util.JobAggregatedMetricsConstants.*;
+import static constants.JobAggregatedMetricsConstants.*;
 
 public class GetJobMetricsComponentTest {
 

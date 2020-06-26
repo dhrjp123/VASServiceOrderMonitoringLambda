@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static util.JobAggregatedMetricsConstants.CITY;
+import static constants.JobAggregatedMetricsConstants.CITY;
 
 public class JobDetailsBuilderTest {
 

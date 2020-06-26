@@ -9,10 +9,18 @@ import com.amazon.vas.serviceordermonitoringlambda.model.JobDetailsBO;
 import com.google.gson.Gson;
 import org.json.simple.JSONObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static util.JobAggregatedMetricsConstants.*;
+import static constants.JobAggregatedMetricsConstants.CITY;
+import static constants.JobAggregatedMetricsConstants.MERCHANT_ID;
+import static constants.JobAggregatedMetricsConstants.NOT_SERVICED;
+import static constants.JobAggregatedMetricsConstants.SLOT_START_TIME;
+import static constants.JobAggregatedMetricsConstants.TECHNICIAN_ID;
 
 public class DefaultModelBuilders {
 
