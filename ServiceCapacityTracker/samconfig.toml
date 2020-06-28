@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "ServiceCapacityTracker"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-msv60xr0afgq"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-470ouwaqzvgd"
 s3_prefix = "ServiceCapacityTracker"
 region = "us-east-1"
 confirm_changeset = true
