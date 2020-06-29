@@ -14,9 +14,9 @@ import java.util.Map;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class DynamoDbAccessor {
-    private static int BATCH_SIZE = 20;
+    private static final int BATCH_SIZE = 20;
     @NonNull
-    private DynamoDBMapper dynamoDBMapper;
+    private final DynamoDBMapper dynamoDBMapper;
 
     public Map<String, List<Object>> getItems(@NonNull final List<CapacityDataItem> items) {
         try {
