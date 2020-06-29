@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @DynamoDBTable(tableName = "CapacityData")
-public class CapacityDataItem implements Comparable {
+public class CapacityDataItem {
     @DynamoDBHashKey(attributeName = "Id")
     private String id;
     @DynamoDBRangeKey(attributeName = "Date")
@@ -29,14 +29,5 @@ public class CapacityDataItem implements Comparable {
     public String getId() {
         this.id = asin + merchantId + pinCode;
         return id;
-    }
-
-    public int compareTo(Object object) {
-        CapacityDataItem capacityDataItem = (CapacityDataItem) object;
-        int k = merchantId.compareTo(capacityDataItem.merchantId);
-        if (k == 0)
-            return date.compareTo(capacityDataItem.date);
-        else
-            return k;
     }
 }

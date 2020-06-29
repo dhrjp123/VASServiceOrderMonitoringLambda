@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
@@ -34,8 +31,10 @@ public class StoreCapacityDetailsBOBuilder {
     private List<StoreCapacityDetailsBO> createResponse(final List<CapacityDataItem> capacityDataItemList,
                                                         final List<StoreCapacityDetailsBOBuilderInput> storeCapacityDetailsBOBuilderInputList,
                                                         final int numberOfDays) {
-        Collections.sort(storeCapacityDetailsBOBuilderInputList);
-        Collections.sort(capacityDataItemList);
+        Collections.sort(storeCapacityDetailsBOBuilderInputList,
+                Comparator.comparing(ob -> ob.getMerchantDetailsBO().getMerchantId()));
+        Collections.sort(capacityDataItemList, Comparator.comparing(CapacityDataItem::getMerchantId)
+                .thenComparing(CapacityDataItem::getDate));
         int currentIndexInCapacityDataItemList = 0;
         final List<StoreCapacityDetailsBO> storeList = new ArrayList<>();
         for (StoreCapacityDetailsBOBuilderInput storeCapacityDetailsBOBuilderInput :
