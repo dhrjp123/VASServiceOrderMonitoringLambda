@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MockStoreCapacityDetailsBOBuilder {
-    StoreCapacityDetailsBO storeCapacityDetailsBO;
+    private StoreCapacityDetailsBO storeCapacityDetailsBO;
 
     public StoreCapacityDetailsBO build() {
         return storeCapacityDetailsBO;

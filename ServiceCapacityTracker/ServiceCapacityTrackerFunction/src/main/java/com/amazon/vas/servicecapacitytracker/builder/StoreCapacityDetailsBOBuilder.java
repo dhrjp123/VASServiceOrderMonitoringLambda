@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(onConstructor = @__({@Inject}))
 public class StoreCapacityDetailsBOBuilder {
-    private static final String DYNAMODB_TABLE_NAME = CapacityDataItem.TABLE_NAME;
     @NonNull
     private final DynamoDbAccessor dynamoDbAccessor;
 
@@ -30,7 +29,8 @@ public class StoreCapacityDetailsBOBuilder {
         final Map<String, List<Object>> capacityItemMap = dynamoDbAccessor.getItems(itemsToGet.stream().map(
                 capacityDataItem -> (Object) capacityDataItem).collect(Collectors.toList()));
         final Map<String, Map<LocalDate, StoreCapacityBO>> merchantCapacityMap =
-                getMerchantCapacityMap((List<CapacityDataItem>) (List) capacityItemMap.get(DYNAMODB_TABLE_NAME));
+                getMerchantCapacityMap(
+                        (List<CapacityDataItem>) (List) capacityItemMap.get(CapacityDataItem.TABLE_NAME));
         return createResponse(merchantCapacityMap, storeCapacityDetailsBOBuilderInputList);
     }
 

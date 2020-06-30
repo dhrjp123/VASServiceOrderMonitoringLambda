@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,13 @@ public class DynamoDbAccessor {
             final Map<String, List<Object>> capacityItemMap = new HashMap<>();
             for (int batch_partition_idx = 0; batch_partition_idx < itemsBatchPartitions.size();
                  batch_partition_idx++) {
-                capacityItemMap.putAll(dynamoDBMapper.batchLoad(itemsBatchPartitions.get(batch_partition_idx)));
+                Map<String, List<Object>> batchCapacityItemMap = dynamoDBMapper
+                        .batchLoad(itemsBatchPartitions.get(batch_partition_idx));
+                batchCapacityItemMap.forEach((k, v) -> capacityItemMap.merge(k, v, (v1, v2) -> {
+                    List<Object> list = new ArrayList<>(v1);
+                    list.addAll(v2);
+                    return list;
+                }));
             }
             return capacityItemMap;
         } catch (final Exception e) {

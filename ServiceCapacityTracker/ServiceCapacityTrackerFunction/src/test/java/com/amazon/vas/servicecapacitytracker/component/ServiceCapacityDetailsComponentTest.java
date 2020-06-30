@@ -48,7 +48,7 @@ public class ServiceCapacityDetailsComponentTest {
     }
 
     @Test
-    public void testGetStoreCapacityDetails_whenValidInputIsPassedWithEmptyStoreName_thenSuccessfulResponse() {
+    public void testGetStoreCapacityDetails_whenValidInputIsPassedWithEmptyStoreName_thenReturnAllAggregatedStoresCapacity() {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
                 new MockServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build();
         final List<StoreCapacityDetailsBO> expectedStoreCapacityDetailsBOList =
@@ -71,7 +71,7 @@ public class ServiceCapacityDetailsComponentTest {
     }
 
     @Test
-    public void testGetStoreCapacityDetails_whenValidInputIsPassedWithStoreName_thenSuccessfulResponse() {
+    public void testGetStoreCapacityDetails_whenValidInputIsPassedWithStoreName_thenReturnAllIndividualStoresCapacity() {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
                 new MockServiceCapacityDetailsInputBOBuilder().withStoreName().build();
         final List<StoreCapacityDetailsBO> expectedStoreCapacityDetailsBOList =
