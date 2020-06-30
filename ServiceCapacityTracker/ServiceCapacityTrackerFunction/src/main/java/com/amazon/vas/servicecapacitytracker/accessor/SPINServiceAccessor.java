@@ -1,8 +1,8 @@
 package com.amazon.vas.servicecapacitytracker.accessor;
 
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsInput;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsOutput;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.MerchantAggregatedDetails;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsInput;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsOutput;
+import com.amazon.vas.servicecapacitytracker.model.spin.MerchantAggregatedDetails;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -19,8 +19,8 @@ public class SPINServiceAccessor {
     }
 
     //Dummy Function to return some Dummy data
-    private List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutputList
-    (final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
+    private List<GetMerchantAggregatedDetailsOutput> getGetMerchantAggregatedDetailsOutputList(
+            final List<GetMerchantAggregatedDetailsInput> getMerchantAggregatedDetailsInputList) {
         final List<GetMerchantAggregatedDetailsOutput> list = getMerchantAggregatedDetailsInputList.stream()
                 .map(getMerchantAggregatedDetailsInput -> {
                     final String merchantId = getMerchantAggregatedDetailsInput.getEncryptedMerchantId();

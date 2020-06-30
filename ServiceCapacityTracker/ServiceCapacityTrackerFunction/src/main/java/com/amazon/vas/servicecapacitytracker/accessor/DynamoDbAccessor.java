@@ -1,7 +1,6 @@
 package com.amazon.vas.servicecapacitytracker.accessor;
 
 import com.amazon.vas.servicecapacitytracker.exception.DependencyFailureException;
-import com.amazon.vas.servicecapacitytracker.model.dynamodbmodel.CapacityDataItem;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.google.common.collect.Lists;
 import lombok.NonNull;
@@ -18,13 +17,14 @@ public class DynamoDbAccessor {
     @NonNull
     private final DynamoDBMapper dynamoDBMapper;
 
-    public Map<String, List<Object>> getItems(@NonNull final List<CapacityDataItem> items) {
+    public Map<String, List<Object>> getItems(@NonNull final List<Object> items) {
         try {
-            final List<List<CapacityDataItem>> itemsBatchPartitions = Lists.partition(items, BATCH_SIZE);
+            final List<List<Object>> itemsBatchPartitions = Lists.partition(items, BATCH_SIZE);
             final Map<String, List<Object>> capacityItemMap = new HashMap<>();
             for (int batch_partition_idx = 0; batch_partition_idx < itemsBatchPartitions.size();
-                 batch_partition_idx++)
+                 batch_partition_idx++) {
                 capacityItemMap.putAll(dynamoDBMapper.batchLoad(itemsBatchPartitions.get(batch_partition_idx)));
+            }
             return capacityItemMap;
         } catch (final Exception e) {
             throw new DependencyFailureException(e);

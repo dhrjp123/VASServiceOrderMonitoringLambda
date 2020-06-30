@@ -1,8 +1,8 @@
 package com.amazon.vas.servicecapacitytracker.router;
 
 import com.amazon.vas.servicecapacitytracker.activity.GetServiceCapacityDetailsActivity;
-import com.amazon.vas.servicecapacitytracker.model.GetServiceCapacityDetailsInput;
-import com.amazon.vas.servicecapacitytracker.model.GetServiceCapacityDetailsOutput;
+import com.amazon.vas.servicecapacitytracker.model.activity.GetServiceCapacityDetailsInput;
+import com.amazon.vas.servicecapacitytracker.model.activity.GetServiceCapacityDetailsOutput;
 import com.amazon.vas.servicecapacitytracker.modules.ServiceCapacityTrackerLambdaModule;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;

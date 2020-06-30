@@ -1,6 +1,6 @@
 package com.amazon.vas.servicecapacitytracker.config;
 
-import com.amazon.vas.servicecapacitytracker.model.CityDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.CityDetailsBO;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,15 +1,19 @@
 package com.amazon.vas.servicecapacitytracker.component;
 
 import com.amazon.vas.servicecapacitytracker.builder.MerchantDetailsBuilder;
-import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBuilder;
+import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.builder.StoreCapacityDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.config.AppConfig;
 import com.amazon.vas.servicecapacitytracker.constants.ConstantsClass;
-import com.amazon.vas.servicecapacitytracker.model.*;
-import com.amazon.vas.servicecapacitytracker.testdata.builders.DefaultMerchantDetailsBOBuilder;
-import com.amazon.vas.servicecapacitytracker.testdata.builders.DefaultServiceCapacityDetailsInputBOBuilder;
-import com.amazon.vas.servicecapacitytracker.testdata.builders.DefaultStoreCapacityDetailsBOBuilder;
-import com.amazon.vas.servicecapacitytracker.testdata.builders.DefaultStoreCapacityDetailsBOBuilderInputBuilder;
+import com.amazon.vas.servicecapacitytracker.model.bo.CityDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.OfferDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.ServiceCapacityDetailsInputBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.StoreCapacityDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.StoreCapacityDetailsBOBuilderInput;
+import com.amazon.vas.servicecapacitytracker.testdata.builders.MockMerchantDetailsBOBuilder;
+import com.amazon.vas.servicecapacitytracker.testdata.builders.MockServiceCapacityDetailsInputBOBuilder;
+import com.amazon.vas.servicecapacitytracker.testdata.builders.MockStoreCapacityDetailsBOBuilder;
+import com.amazon.vas.servicecapacitytracker.testdata.builders.MockStoreCapacityDetailsBOBuilderInputBuilder;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +34,7 @@ public class ServiceCapacityDetailsComponentTest {
     @Mock
     private MerchantDetailsBuilder merchantDetailsBuilder;
     @Mock
-    private OfferDetailsBuilder offerDetailsBuilder;
+    private OfferDetailsBOBuilder offerDetailsBOBuilder;
     @Mock
     private StoreCapacityDetailsBOBuilder storeCapacityDetailsBOBuilder;
     @Mock
@@ -39,58 +43,64 @@ public class ServiceCapacityDetailsComponentTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+        Mockito.when(appConfig.getCityMapper()).thenReturn(getDefaultCityMap());
+        Mockito.when(appConfig.getAsinMapper()).thenReturn(getDefaultAsinMap());
     }
 
     @Test
     public void testGetStoreCapacityDetails_whenValidInputIsPassedWithEmptyStoreName_thenSuccessfulResponse() {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
-                new DefaultServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build();
+                new MockServiceCapacityDetailsInputBOBuilder().withEmptyStoreName().build();
         final List<StoreCapacityDetailsBO> expectedStoreCapacityDetailsBOList =
-                ImmutableList.of(new DefaultStoreCapacityDetailsBOBuilder().forAggregatedMerchants().build());
-        List<StoreCapacityDetailsBOBuilderInput> storeCapacityDetailsBOBuilderInputList =
+                ImmutableList.of(new MockStoreCapacityDetailsBOBuilder().withAggregatedMerchants().build());
+        final List<StoreCapacityDetailsBOBuilderInput> storeCapacityDetailsBOBuilderInputList =
                 ImmutableList
-                        .of(new DefaultStoreCapacityDetailsBOBuilderInputBuilder().forAggregatedMerchants().build());
-        Mockito.when(appConfig.getCityMapper()).thenReturn(getDefaultCityMap());
-        Mockito.when(appConfig.getAsinMapper()).thenReturn(getDefaultAsinMap());
-        Mockito.when(storeCapacityDetailsBOBuilder.getResponse(
-                storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS))
+                        .of(new MockStoreCapacityDetailsBOBuilderInputBuilder().withAggregatedMerchants().build());
+
+        Mockito.when(storeCapacityDetailsBOBuilder.getResponse(ConstantsClass.MARKETPLACE_ID,
+                storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_DAYS))
                 .thenReturn(expectedStoreCapacityDetailsBOList);
+
         List<StoreCapacityDetailsBO> storeCapacityDetailsBOList = serviceCapacityDetailsComponent
                 .getStoreCapacityDetails(serviceCapacityDetailsInputBO);
+
         assertEquals(expectedStoreCapacityDetailsBOList, storeCapacityDetailsBOList);
         Mockito.verify(storeCapacityDetailsBOBuilder)
-                .getResponse(storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS);
+                .getResponse(ConstantsClass.MARKETPLACE_ID, storeCapacityDetailsBOBuilderInputList,
+                        ConstantsClass.NUMBER_OF_DAYS);
     }
 
     @Test
     public void testGetStoreCapacityDetails_whenValidInputIsPassedWithStoreName_thenSuccessfulResponse() {
         final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO =
-                new DefaultServiceCapacityDetailsInputBOBuilder().withStoreName().build();
+                new MockServiceCapacityDetailsInputBOBuilder().withStoreName().build();
         final List<StoreCapacityDetailsBO> expectedStoreCapacityDetailsBOList =
-                ImmutableList.of(new DefaultStoreCapacityDetailsBOBuilder().forIndividualMerchants().build());
+                ImmutableList.of(new MockStoreCapacityDetailsBOBuilder().withIndividualMerchants().build());
         final List<StoreCapacityDetailsBOBuilderInput> storeCapacityDetailsBOBuilderInputList =
                 ImmutableList
-                        .of(new DefaultStoreCapacityDetailsBOBuilderInputBuilder().forIndividualMerchants().build());
-        Mockito.when(appConfig.getAsinMapper()).thenReturn(getDefaultAsinMap());
-        Mockito.when(appConfig.getCityMapper()).thenReturn(getDefaultCityMap());
-        Mockito.when(storeCapacityDetailsBOBuilder.getResponse(
-                storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS))
+                        .of(new MockStoreCapacityDetailsBOBuilderInputBuilder().withIndividualMerchants().build());
+
+        Mockito.when(storeCapacityDetailsBOBuilder.getResponse(ConstantsClass.MARKETPLACE_ID,
+                storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_DAYS))
                 .thenReturn(expectedStoreCapacityDetailsBOList);
-        Mockito.when(offerDetailsBuilder
-                .getOfferDetailsList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE))
-                .thenReturn(ImmutableList.of(OfferDetails.builder().merchantId(ConstantsClass.INDIVIDUAL_MERCHANT_ID)
-                        .isAggregated(false).build(), OfferDetails.builder().merchantId(ConstantsClass.DUMMY_MERCHANT)
+        Mockito.when(offerDetailsBOBuilder
+                .getOfferDetailsBOList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE))
+                .thenReturn(ImmutableList.of(OfferDetailsBO.builder().merchantId(ConstantsClass.INDIVIDUAL_MERCHANT_ID)
+                        .isAggregated(false).build(), OfferDetailsBO.builder().merchantId(ConstantsClass.DUMMY_MERCHANT)
                         .isAggregated(true).build()));
         Mockito.when(merchantDetailsBuilder.getMerchants(ConstantsClass.MARKETPLACE_ID,
                 ImmutableList.of(ConstantsClass.INDIVIDUAL_MERCHANT_ID)))
-                .thenReturn(ImmutableList.of(new DefaultMerchantDetailsBOBuilder().forIndividualMerchants().build()));
+                .thenReturn(ImmutableList.of(new MockMerchantDetailsBOBuilder().withIndividualMerchants().build()));
+
         final List<StoreCapacityDetailsBO> storeCapacityDetailsBOList = serviceCapacityDetailsComponent
                 .getStoreCapacityDetails(serviceCapacityDetailsInputBO);
+
         assertEquals(expectedStoreCapacityDetailsBOList, storeCapacityDetailsBOList);
         Mockito.verify(storeCapacityDetailsBOBuilder)
-                .getResponse(storeCapacityDetailsBOBuilderInputList, ConstantsClass.NUMBER_OF_COLUMNS);
-        Mockito.verify(offerDetailsBuilder)
-                .getOfferDetailsList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE);
+                .getResponse(ConstantsClass.MARKETPLACE_ID, storeCapacityDetailsBOBuilderInputList,
+                        ConstantsClass.NUMBER_OF_DAYS);
+        Mockito.verify(offerDetailsBOBuilder)
+                .getOfferDetailsBOList(ConstantsClass.MARKETPLACE_ID, ConstantsClass.ASIN, ConstantsClass.PINCODE);
         Mockito.verify(merchantDetailsBuilder).getMerchants(ConstantsClass.MARKETPLACE_ID,
                 ImmutableList.of(ConstantsClass.INDIVIDUAL_MERCHANT_ID));
     }

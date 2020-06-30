@@ -1,9 +1,9 @@
 package com.amazon.vas.servicecapacitytracker.builder;
 
 import com.amazon.vas.servicecapacitytracker.accessor.SPINServiceAccessor;
-import com.amazon.vas.servicecapacitytracker.model.MerchantDetailsBO;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsInput;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsOutput;
+import com.amazon.vas.servicecapacitytracker.model.bo.MerchantDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsInput;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsOutput;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

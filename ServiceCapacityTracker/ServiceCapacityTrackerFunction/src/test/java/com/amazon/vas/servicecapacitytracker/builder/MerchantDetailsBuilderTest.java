@@ -2,11 +2,11 @@ package com.amazon.vas.servicecapacitytracker.builder;
 
 import com.amazon.vas.servicecapacitytracker.accessor.SPINServiceAccessor;
 import com.amazon.vas.servicecapacitytracker.constants.ConstantsClass;
-import com.amazon.vas.servicecapacitytracker.model.MerchantDetailsBO;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsInput;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.GetMerchantAggregatedDetailsOutput;
-import com.amazon.vas.servicecapacitytracker.model.spinservicemodel.MerchantAggregatedDetails;
-import com.amazon.vas.servicecapacitytracker.testdata.builders.DefaultMerchantDetailsBOBuilder;
+import com.amazon.vas.servicecapacitytracker.model.bo.MerchantDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsInput;
+import com.amazon.vas.servicecapacitytracker.model.spin.GetMerchantAggregatedDetailsOutput;
+import com.amazon.vas.servicecapacitytracker.model.spin.MerchantAggregatedDetails;
+import com.amazon.vas.servicecapacitytracker.testdata.builders.MockMerchantDetailsBOBuilder;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,12 +41,15 @@ public class MerchantDetailsBuilderTest {
                 ImmutableList.of(GetMerchantAggregatedDetailsOutput.builder()
                         .merchantAggregatedDetails(MerchantAggregatedDetails.builder()
                                 .merchantName(ConstantsClass.INDIVIDUAL_MERCHANT_Name).build()).build());
-        final List<MerchantDetailsBO> expectedMerchantsList = ImmutableList.of(new DefaultMerchantDetailsBOBuilder()
-                .forIndividualMerchants().build());
+        final List<MerchantDetailsBO> expectedMerchantsList = ImmutableList.of(new MockMerchantDetailsBOBuilder()
+                .withIndividualMerchants().build());
+
         Mockito.when(spinServiceAccessor.getGetMerchantAggregatedDetailsOutput(getMerchantAggregatedDetailsInputList))
                 .thenReturn(getMerchantAggregatedDetailsOutputList);
+
         final List<MerchantDetailsBO> merchantsList = merchantDetailsBuilder.getMerchants(ConstantsClass.MARKETPLACE_ID,
                 merchantsId);
+
         assertEquals(expectedMerchantsList, merchantsList);
         Mockito.verify(spinServiceAccessor)
                 .getGetMerchantAggregatedDetailsOutput(getMerchantAggregatedDetailsInputList);

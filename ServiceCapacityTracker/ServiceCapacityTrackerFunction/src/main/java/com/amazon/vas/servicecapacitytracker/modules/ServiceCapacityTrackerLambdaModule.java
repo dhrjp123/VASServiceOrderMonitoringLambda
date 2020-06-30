@@ -5,7 +5,7 @@ import com.amazon.vas.servicecapacitytracker.accessor.SPINServiceAccessor;
 import com.amazon.vas.servicecapacitytracker.accessor.VOSServiceAccessor;
 import com.amazon.vas.servicecapacitytracker.activity.GetServiceCapacityDetailsActivity;
 import com.amazon.vas.servicecapacitytracker.builder.MerchantDetailsBuilder;
-import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBuilder;
+import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.builder.StoreCapacityDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.component.ServiceCapacityDetailsComponent;
 import com.amazon.vas.servicecapacitytracker.config.AppConfig;
@@ -30,36 +30,38 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
     @Singleton
     @Provides
     public GetServiceCapacityDetailsActivity buildServiceCapacityTrackerActivity(
-            @NonNull ServiceCapacityDetailsComponent serviceCapacityDetailsComponent) {
+            @NonNull final ServiceCapacityDetailsComponent serviceCapacityDetailsComponent) {
         return new GetServiceCapacityDetailsActivity(serviceCapacityDetailsComponent);
     }
 
     @Singleton
     @Provides
     public ServiceCapacityDetailsComponent buildServiceCapacityTrackerComponent(
-            @NonNull MerchantDetailsBuilder merchantDetailsBuilder, @NonNull OfferDetailsBuilder offerDetailsBuilder,
-            @NonNull StoreCapacityDetailsBOBuilder storeCapacityDetailsBOBuilder, @NonNull AppConfig appConfig) {
-        return new ServiceCapacityDetailsComponent(merchantDetailsBuilder, offerDetailsBuilder,
+            @NonNull final MerchantDetailsBuilder merchantDetailsBuilder,
+            @NonNull final OfferDetailsBOBuilder offerDetailsBOBuilder,
+            @NonNull final StoreCapacityDetailsBOBuilder storeCapacityDetailsBOBuilder,
+            @NonNull final AppConfig appConfig) {
+        return new ServiceCapacityDetailsComponent(merchantDetailsBuilder, offerDetailsBOBuilder,
                 storeCapacityDetailsBOBuilder,
                 appConfig);
     }
 
     @Singleton
     @Provides
-    public OfferDetailsBuilder buildOfferDetailsBuilder(@NonNull VOSServiceAccessor vosServiceAccessor) {
-        return new OfferDetailsBuilder(vosServiceAccessor);
+    public OfferDetailsBOBuilder buildOfferDetailsBOBuilder(@NonNull final VOSServiceAccessor vosServiceAccessor) {
+        return new OfferDetailsBOBuilder(vosServiceAccessor);
     }
 
     @Singleton
     @Provides
-    public MerchantDetailsBuilder buildMerchantDetailsBuilder(@NonNull SPINServiceAccessor spinServiceAccessor) {
+    public MerchantDetailsBuilder buildMerchantDetailsBuilder(@NonNull final SPINServiceAccessor spinServiceAccessor) {
         return new MerchantDetailsBuilder(spinServiceAccessor);
     }
 
     @Singleton
     @Provides
     public StoreCapacityDetailsBOBuilder buildStoreCapacityDetailsBOBuilder(
-            @NonNull DynamoDbAccessor dynamoDbAccessor) {
+            @NonNull final DynamoDbAccessor dynamoDbAccessor) {
         return new StoreCapacityDetailsBOBuilder(dynamoDbAccessor);
     }
 
@@ -77,13 +79,13 @@ public class ServiceCapacityTrackerLambdaModule extends AbstractModule {
 
     @Singleton
     @Provides
-    public DynamoDbAccessor buildDynamoDbAccessor(@NonNull DynamoDBMapper dynamoDBMapper) {
+    public DynamoDbAccessor buildDynamoDbAccessor(@NonNull final DynamoDBMapper dynamoDBMapper) {
         return new DynamoDbAccessor(dynamoDBMapper);
     }
 
     @Singleton
     @Provides
-    public DynamoDBMapper buildDynamoDBMapper(@Named("region") Regions regions) {
+    public DynamoDBMapper buildDynamoDBMapper(@Named("region") final Regions regions) {
         DefaultAWSCredentialsProviderChain credentialsProvider = new
                 DefaultAWSCredentialsProviderChain();
         AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()

@@ -1,7 +1,7 @@
 package com.amazon.vas.servicecapacitytracker.accessor;
 
-import com.amazon.vas.servicecapacitytracker.model.vosservicemodel.GetBuyableOffersInput;
-import com.amazon.vas.servicecapacitytracker.model.vosservicemodel.VasOffer;
+import com.amazon.vas.servicecapacitytracker.model.vos.GetBuyableOffersInput;
+import com.amazon.vas.servicecapacitytracker.model.vos.VasOffer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

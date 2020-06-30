@@ -1,10 +1,15 @@
 package com.amazon.vas.servicecapacitytracker.component;
 
 import com.amazon.vas.servicecapacitytracker.builder.MerchantDetailsBuilder;
-import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBuilder;
+import com.amazon.vas.servicecapacitytracker.builder.OfferDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.builder.StoreCapacityDetailsBOBuilder;
 import com.amazon.vas.servicecapacitytracker.config.AppConfig;
-import com.amazon.vas.servicecapacitytracker.model.*;
+import com.amazon.vas.servicecapacitytracker.model.bo.CityDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.MerchantDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.OfferDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.ServiceCapacityDetailsInputBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.StoreCapacityDetailsBO;
+import com.amazon.vas.servicecapacitytracker.model.bo.StoreCapacityDetailsBOBuilderInput;
 import com.amazonaws.util.StringUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,19 +26,19 @@ public class ServiceCapacityDetailsComponent {
     @NonNull
     private final MerchantDetailsBuilder merchantDetailsBuilder;
     @NonNull
-    private final OfferDetailsBuilder offerDetailsBuilder;
+    private final OfferDetailsBOBuilder offerDetailsBOBuilder;
     @NonNull
     private final StoreCapacityDetailsBOBuilder storeCapacityDetailsBOBuilder;
     @NonNull
     private final AppConfig appConfig;
 
-    public List<StoreCapacityDetailsBO> getStoreCapacityDetails
-            (@NonNull final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO) {
+    public List<StoreCapacityDetailsBO> getStoreCapacityDetails(
+            @NonNull final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO) {
         final List<MerchantDetailsBO> merchantList = getMerchantList(serviceCapacityDetailsInputBO);
         final List<StoreCapacityDetailsBOBuilderInput> storeCapacityDetailsBOBuilderInputList =
                 getStoreCapacityDetailsBOBuilderInputList(serviceCapacityDetailsInputBO, merchantList);
-        return storeCapacityDetailsBOBuilder.getResponse(storeCapacityDetailsBOBuilderInputList,
-                serviceCapacityDetailsInputBO.getNumberOfDays());
+        return storeCapacityDetailsBOBuilder.getResponse(serviceCapacityDetailsInputBO.getMarketplaceId(),
+                storeCapacityDetailsBOBuilderInputList, serviceCapacityDetailsInputBO.getNumberOfDays());
     }
 
     private String getAsinFromSkillType(final String skillType) {
@@ -47,17 +52,18 @@ public class ServiceCapacityDetailsComponent {
     }
 
     private List<StoreCapacityDetailsBOBuilderInput> getStoreCapacityDetailsBOBuilderInputList(
-            final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO
-            , final List<MerchantDetailsBO> merchantList) {
+            final ServiceCapacityDetailsInputBO serviceCapacityDetailsInputBO,
+            final List<MerchantDetailsBO> merchantList) {
         final String asin = getAsinFromSkillType(serviceCapacityDetailsInputBO.getSkillType());
         final String storeName = serviceCapacityDetailsInputBO.getStoreName();
         return merchantList.stream()
                 .map(merchant -> {
                     String pinCode;
-                    if (StringUtils.isNullOrEmpty(storeName))
+                    if (StringUtils.isNullOrEmpty(storeName)) {
                         pinCode = getPinCodeFromStoreName(merchant.getMerchantName());
-                    else
+                    } else {
                         pinCode = getPinCodeFromStoreName(storeName);
+                    }
                     return StoreCapacityDetailsBOBuilderInput.builder().merchantDetailsBO(merchant)
                             .asin(asin).pinCode(pinCode).build();
                 }).collect(Collectors.toList());
@@ -68,18 +74,19 @@ public class ServiceCapacityDetailsComponent {
         final Map<String, CityDetailsBO> cityMap = appConfig.getCityMapper();
         final String storeName = serviceCapacityDetailsInputBO.getStoreName();
         final String asin = getAsinFromSkillType(serviceCapacityDetailsInputBO.getSkillType());
-        if (StringUtils.isNullOrEmpty(storeName))
+        if (StringUtils.isNullOrEmpty(storeName)) {
             return getAggregatedMerchantDetailsList(cityMap);
-        else {
+        } else {
             final String pinCode = cityMap.get(storeName).getPinCode();
-            final List<OfferDetails> offerDetailsList =
-                    offerDetailsBuilder
-                            .getOfferDetailsList(serviceCapacityDetailsInputBO.getMarketplaceId(), asin, pinCode);
-            final List<String> underlyingMerchantsId = offerDetailsList.stream().flatMap(offerDetails -> {
-                if (!offerDetails.isAggregated())
-                    return Stream.of(offerDetails.getMerchantId());
-                else
+            final List<OfferDetailsBO> offerDetailsBOList =
+                    offerDetailsBOBuilder
+                            .getOfferDetailsBOList(serviceCapacityDetailsInputBO.getMarketplaceId(), asin, pinCode);
+            final List<String> underlyingMerchantsId = offerDetailsBOList.stream().flatMap(offerDetailsBO -> {
+                if (!offerDetailsBO.isAggregated()) {
+                    return Stream.of(offerDetailsBO.getMerchantId());
+                } else {
                     return Stream.empty();
+                }
             }).collect(Collectors.toList());
             return merchantDetailsBuilder.getMerchants(serviceCapacityDetailsInputBO.getMarketplaceId(),
                     underlyingMerchantsId);
