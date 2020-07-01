@@ -6,7 +6,6 @@ import com.amazon.vas.serviceordermonitoringlambda.model.activity.GetJobMetricsI
 import com.amazon.vas.serviceordermonitoringlambda.model.activity.GetJobMetricsOutput;
 import com.amazon.vas.serviceordermonitoringlambda.model.activity.GetServiceCapacityDetailsInput;
 import com.amazon.vas.serviceordermonitoringlambda.model.activity.GetServiceCapacityDetailsOutput;
-import com.amazon.vas.serviceordermonitoringlambda.modules.ServiceCapacityTrackerLambdaModule;
 import com.amazon.vas.serviceordermonitoringlambda.modules.ServiceOrderMonitoringLambdaModule;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -54,7 +53,7 @@ public class RequestRouter implements RequestHandler<Map<Object, Object>, Object
     }
 
     private GetServiceCapacityDetailsActivity getGetServiceCapacityDetailsActivityInstance() {
-        final Injector injector = Guice.createInjector(new ServiceCapacityTrackerLambdaModule());
+        final Injector injector = Guice.createInjector(new ServiceOrderMonitoringLambdaModule());
         return injector.getInstance(GetServiceCapacityDetailsActivity.class);
     }
 
