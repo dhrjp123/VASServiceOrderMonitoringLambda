@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS
+
+  Sample SAM Template for AWS
+
+Parameters:
+  YourEmail:
+    Type: String
+    Default: padheera@amazon.com
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 300
+
+Resources:
+  ServiceMonitoringFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: .
+      Handler: router.RequestRouter::handleRequest
+      Runtime: java8
+      MemorySize: 512
+      Policies:
+      - AmazonDynamoDBFullAccess
+      Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+        Variables:
+          PARAM1: VALUE
+      Events:
+        serviceTracker:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /test
+            RestApiId: !Ref ServiceMonitoringApi
+            Method: POST
+#            CORS: true
+        jobMetrics:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /jobMetrics
+            RestApiId: !Ref ServiceMonitoringApi
+            Method: POST
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      UserPoolName: VASServiceMonitoringWebAppUserPool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireLowercase: true
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: false
+  UserPoolTokenClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - USER_PASSWORD_AUTH
+  UserPoolUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      DesiredDeliveryMediums:
+        - EMAIL
+      Username: !Ref YourEmail
+      UserPoolId: !Ref UserPool
+
+  ServiceMonitoringApi:
+    DependsOn: UserPool
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ServiceMonitoringApi
+      StageName: Prod
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt "UserPool.Arn"
+
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  ServiceMonitoringApi:
+    Description: "API Gateway endpoint URL for Prod stage for Service Monitoring function"
+    Value: !Ref ServiceMonitoringApi
+  ServiceMonitoringFunction:
+    Description: "Service Monitoring Lambda Function ARN"
+    Value: !GetAtt ServiceMonitoringFunction.Arn
+  ServiceMonitoringFunctionIamRole:
+    Description: "Implicit IAM Role created for Service Monitoring function"
+    Value: !GetAtt ServiceMonitoringFunctionRole.Arn

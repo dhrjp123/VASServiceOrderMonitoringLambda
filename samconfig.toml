@@ -1,0 +1,9 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "ServiceMonitoringLambda"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-rd83kjdtn936"
+s3_prefix = "ServiceMonitoringLambda"
+region = "us-east-1"
+capabilities = "CAPABILITY_IAM"
