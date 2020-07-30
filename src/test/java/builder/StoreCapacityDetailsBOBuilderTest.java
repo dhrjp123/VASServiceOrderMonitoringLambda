@@ -6,6 +6,7 @@ import accessor.VOSServiceAccessor;
 import component.ServiceCapacityDetailsComponent;
 import config.AppConfig;
 import constants.ConstantsClass;
+import model.bo.CityDetailsBO;
 import model.bo.ServiceCapacityDetailsInputBO;
 import model.bo.StoreCapacityDetailsBO;
 import model.bo.StoreCapacityDetailsBOBuilderInput;
@@ -25,6 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -68,14 +71,14 @@ public class StoreCapacityDetailsBOBuilderTest {
         final List<StoreCapacityDetailsBO> expectedStoreCapacityDetailsBOList =
                 ImmutableList.of(new MockStoreCapacityDetailsBOBuilder().withAggregatedMerchants().build());
 
-//        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-//                .withCredentials(new DefaultAWSCredentialsProviderChain())
-//                .withRegion("us-east-1").build();
-//        DynamoDBMapper dMapper = new DynamoDBMapper(client);
-//        DynamoDbAccessor dynamoDbAccessor = new DynamoDbAccessor(dMapper);
-//
-//        //Map<String, List<Object>> rtn = dynamoDbAccessor.getItems(getDefaultItemsToGetList());
-//        //dynamoDbAccessor.writeItems(getDefaultItemsToGetList());
+        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+                .withCredentials(new DefaultAWSCredentialsProviderChain())
+                .withRegion("us-east-1").build();
+        DynamoDBMapper dMapper = new DynamoDBMapper(client);
+        DynamoDbAccessor dynamoDbAccessor = new DynamoDbAccessor(dMapper);
+
+        ////Map<String, List<Object>> rtn = dynamoDbAccessor.getItems(getDefaultItemsToGetList());
+        dynamoDbAccessor.writeItems(getDefaultItemsToGetList());
 //
 //        StoreCapacityDetailsBOBuilder storeCapacityDetailsBOBuilder =
 //                new StoreCapacityDetailsBOBuilder(dynamoDbAccessor);
@@ -113,6 +116,7 @@ public class StoreCapacityDetailsBOBuilderTest {
 
 
     private List<Object> getDefaultItemsToGetList() {
+
         List<CapacityDataItem> list = new ArrayList<>();
         Random random = new Random(0);
         List<String> asins = ImmutableList.of("AID1", "AID2" , "AID3");
@@ -123,9 +127,19 @@ public class StoreCapacityDetailsBOBuilderTest {
             String pin = pins.get(random.nextInt(2));
             String mid = "MID"+random.nextInt(10);
 
-            for( int j = 0 ; j< 6 ; j++) {
-                String date = "2020-07-" + (25 + j);
-                list.add(getCapacityDataItem(asin, pin, mid, date));
+            for( int j = 0 ; j< 100 ; j++) {
+                Date currDate = DateUtils.addDays(new Date(), j);
+                String month = String.valueOf(currDate.getMonth());
+                if(currDate.getMonth() < 9) month = "0" + month;
+
+                String day = String.valueOf(currDate.getDay());
+                if(currDate.getDay() < 9) day = "0" + day;
+
+                final String date = "2020-"+month+"-"+day;
+                ImmutableList.of("CMID1", "CMID2").forEach(p ->
+                                list.add(getCapacityDataItem(asin, pin, p, date))
+                );
+                list.add(getCapacityDataItem(asin, pin, mid, "2020-"+month+"-"+day));
             }
         }
         Set<String> set = new HashSet<>(list.size());

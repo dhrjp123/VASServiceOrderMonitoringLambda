@@ -21,6 +21,7 @@ import model.bo.GetJobMetricsInputBO;
 import model.bo.JobDetailsBO;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 
@@ -80,8 +81,8 @@ public class JobDetailsBuilder {
 
     private List<JobDetailsBO> getJobDetailsBOList(GetJobMetricsInputBO getJobMetricsInputBO) {
         Random r = new Random(0);
-        List<String> cities = ImmutableList.of("Delhi", "Jaipur", "Hyderabad", "Mumbai", "Shimla", "Manali", "OOty",
-                "Patna", "jabalpur", "Khandala");
+        List<String> cities = Lists.newArrayList("Delhi", "Noida", "Hyderabad", "Mumbai", "Kolkata", "Pune", "Jaipur",
+                "Ahmedabad", "Ranchi", "Kanpur", "Bangluru");
         List<JobDetailsBO> jobDetailsBOS = new ArrayList<>();
         for(int i=0; i< 100 ;i++) {
             jobDetailsBOS.add(JobDetailsBO.builder()
